@@ -1,0 +1,131 @@
+import { useState } from 'react'
+import { Link, NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
+
+/**
+ * Premium header. Desktop: logo, Home, Browse Fleet, About (in-page anchor
+ * to the "Why Choose Bliss Rent" section), Services (in-page anchor to
+ * "How It Works"), language switcher, and the primary "Search Cars" CTA.
+ * No Contact/Support link — there is no real support channel to point it
+ * at yet (the user chose in-page anchors only over inventing one).
+ * Mobile: hamburger drawer with the same links plus the CTA.
+ */
+export function NavBar() {
+  const [open, setOpen] = useState(false)
+  const { t } = useTranslation()
+
+  const links = [
+    { to: '/', label: t('nav.home'), end: true },
+    { to: '/search', label: t('nav.browseFleet'), end: false },
+  ]
+  const anchors = [
+    { to: { pathname: '/', hash: '#why-choose' }, label: t('nav.about') },
+    { to: { pathname: '/', hash: '#how-it-works' }, label: t('nav.services') },
+  ]
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-brand-navy/10 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-navy text-sm font-bold text-white">
+            BR
+          </span>
+          <span className="text-base font-semibold text-brand-navy sm:text-lg">
+            {t('nav.brand')}
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-7 lg:flex">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.end}
+              className={({ isActive }) =>
+                'text-sm font-medium transition-colors ' +
+                (isActive ? 'text-brand-navy' : 'text-slate-500 hover:text-brand-navy')
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+          {anchors.map((anchor) => (
+            <Link
+              key={anchor.label}
+              to={anchor.to}
+              className="text-sm font-medium text-slate-500 transition-colors hover:text-brand-navy"
+            >
+              {anchor.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden items-center gap-4 lg:flex">
+          <LanguageSwitcher />
+          <Link
+            to="/search"
+            className="rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light"
+          >
+            {t('nav.searchCars')}
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-navy"
+            aria-label={t('nav.toggleMenu')}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              {open ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <nav className="border-t border-brand-navy/10 bg-white px-4 py-3 lg:hidden">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.end}
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                'block rounded-md px-3 py-2 text-sm font-medium ' +
+                (isActive ? 'bg-brand-lavender text-brand-navy' : 'text-slate-600 hover:bg-brand-lavender/60')
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+          {anchors.map((anchor) => (
+            <Link
+              key={anchor.label}
+              to={anchor.to}
+              onClick={() => setOpen(false)}
+              className="block rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-brand-lavender/60"
+            >
+              {anchor.label}
+            </Link>
+          ))}
+          <Link
+            to="/search"
+            onClick={() => setOpen(false)}
+            className="mt-2 block rounded-lg bg-brand-gold px-3 py-2.5 text-center text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light"
+          >
+            {t('nav.searchCars')}
+          </Link>
+        </nav>
+      )}
+    </header>
+  )
+}
