@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/*
+ * Bliss Rent brand theme.
+ *
+ * Inspired by the muted navy / soft lavender / warm gold palette common
+ * to Gulf-region government and travel sites (e.g. Saudi's eVisa portal)
+ * — adapted into Bliss Rent's own tokens, not copied wholesale. Defined
+ * once here as Tailwind v4 @theme tokens so `bg-brand-navy`,
+ * `text-brand-gold`, etc. are available everywhere, and the palette can
+ * be retuned from this single file.
+ */
+@theme {
+  --color-brand-navy: #2e2a54;
+  --color-brand-navy-dark: #201c3b;
+  --color-brand-navy-light: #46407c;
+
+  --color-brand-lavender: #edebf4;
+  --color-brand-lavender-dark: #e0dcec;
+
+  --color-brand-gold: #b49b6c;
+  --color-brand-gold-dark: #96794a;
+  --color-brand-gold-light: #d9c9a3;
+
+  --font-sans: 'Cairo', 'Noto Kufi Arabic', ui-sans-serif, system-ui, sans-serif;
+}
+
+html[dir='rtl'] {
+  font-family: 'Cairo', 'Noto Kufi Arabic', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Numbers, dates, and currency codes stay left-to-right even inside RTL
+   Arabic layout — mixing digit direction into RTL text is a well-known
+   readability problem, so these are pinned explicitly rather than left
+   to bidi auto-detection. */
+.ltr-nums {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+/* BrandsMarquee — an infinite horizontal scroll built from two identical
+   copies of the brand list placed side by side; animating the wrapper by
+   exactly -50% loops seamlessly since the second copy is a perfect mirror
+   of the first. Direction is fixed (not RTL-flipped) since this is purely
+   decorative motion, not reading order. Paused on hover/focus and skipped
+   entirely for prefers-reduced-motion (BrandsMarquee.tsx renders a static
+   row instead of applying this class in that case). */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 28s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-marquee:focus-within {
+  animation-play-state: paused;
+}
