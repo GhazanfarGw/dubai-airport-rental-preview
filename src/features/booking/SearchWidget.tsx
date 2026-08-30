@@ -21,18 +21,21 @@ import type { Location, SearchCriteria } from '@/types/domain'
  * (Dubai and Abu Dhabi) are what shows up, more appear the moment real
  * rows for them exist, and none of this list is ever hardcoded.
  *
- * Layout: a single flat row of individually-labelled fields (Pickup City,
- * Pickup Location, an optional Return Location, the pickup/return date
- * range, Pickup/Return Time, Search) — flexbox, not a grid, so the row
- * wraps naturally full-width per field on narrow screens and lays out as
- * one line on wider ones. A "Same Return Location" checkbox (checked by
- * default) hides the Return Location field entirely and reuses the
- * pickup point for drop-off, matching a standard one-city round trip;
- * unchecking it reveals a single Return Location field that searches
- * every UAE location directly (no separate return-city step), enabling a
- * one-way rental. Pickup/Return Time are informational only — see
- * src/lib/timeOptions.ts — and never touch date validation, availability,
- * or pricing, all of which remain delegated to dateRange.ts unchanged.
+ * Layout: a flat row of individually-labelled fields (Pickup City, Pickup
+ * Location, an optional Return Location, the pickup/return date range,
+ * Search) — flexbox, not a grid, so the row wraps naturally full-width
+ * per field on narrow screens and lays out as one line on wider ones.
+ * Nothing here scrolls horizontally, in either layout — a field set too
+ * wide for the viewport wraps onto another line instead. Pickup/Return
+ * Time sit on their own line below the main row (never inside it), then
+ * the "Same Return Location" checkbox. Checked by default, the checkbox
+ * hides the Return Location field entirely and reuses the pickup point
+ * for drop-off, matching a standard one-city round trip; unchecking it
+ * reveals a single Return Location field that searches every UAE location
+ * directly (no separate return-city step), enabling a one-way rental.
+ * Pickup/Return Time are informational only — see src/lib/timeOptions.ts
+ * — and never touch date validation, availability, or pricing, all of
+ * which remain delegated to dateRange.ts unchanged.
  */
 const UAE = 'United Arab Emirates'
 const DEFAULT_CITY = 'Dubai'
@@ -43,12 +46,12 @@ interface SearchWidgetProps {
   /** Compact layout for the "edit search" bar on the results page. */
   compact?: boolean
   /**
-   * 'grid' (default): the main booking-section widget — same flat-row
-   * field set, wrapping (flex-wrap) onto multiple lines on narrow screens.
-   * 'row': a single horizontally-scrollable row with the button inline at
-   * the end — used by StickySearchBar so the sticky bar stays genuinely
-   * compact on narrow (mobile) screens instead of wrapping taller.
-   * Same form, state, and validation either way.
+   * 'grid' (default): the main booking-section widget.
+   * 'row': the same flat-row field set at more compact widths (see the
+   * `row` prop each field takes) — used by StickySearchBar so the sticky
+   * bar stays visually tighter. Both wrap (flex-wrap) onto further lines
+   * on narrow screens; neither ever scrolls horizontally. Same form,
+   * state, and validation either way.
    */
   layout?: 'grid' | 'row'
 }
@@ -135,7 +138,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
         (compact ? 'p-4' : 'p-5 sm:p-6')
       }
     >
-      <div className={fieldRow ? 'flex flex-nowrap items-end gap-3 overflow-x-auto' : 'flex flex-wrap items-end gap-3'}>
+      <div className="flex flex-wrap items-end gap-3">
         <CitySelect
           label={t('searchWidget.pickupCity')}
           ariaLabel={t('searchWidget.pickupCity')}
@@ -185,6 +188,12 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
           />
         </div>
 
+        <Button type="submit" fullWidthOnMobile={!fieldRow} className={fieldRow ? 'mb-px shrink-0' : undefined}>
+          {t('searchWidget.searchCars')}
+        </Button>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-end gap-3">
         <TimeSelect
           label={t('searchWidget.pickupTime')}
           ariaLabel={t('searchWidget.pickupTime')}
@@ -199,10 +208,6 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
           onChange={setReturnTime}
           row={fieldRow}
         />
-
-        <Button type="submit" fullWidthOnMobile={!fieldRow} className={fieldRow ? 'mb-px shrink-0' : undefined}>
-          {t('searchWidget.searchCars')}
-        </Button>
       </div>
 
       <label className="mt-3 flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600">
