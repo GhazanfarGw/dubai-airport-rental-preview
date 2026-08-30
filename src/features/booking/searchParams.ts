@@ -7,9 +7,8 @@ export function criteriaToSearchParams(c: SearchCriteria): URLSearchParams {
     pickup: c.pickupLocationId,
     dropoff: c.dropoffLocationId,
   })
-  // Optional display-only metadata — see SearchCriteria.pickupTime/returnTime.
+  // Optional display-only metadata — see SearchCriteria.pickupTime.
   if (c.pickupTime) params.set('ptime', c.pickupTime)
-  if (c.returnTime) params.set('rtime', c.returnTime)
   return params
 }
 
@@ -20,7 +19,6 @@ export function searchParamsToCriteria(params: URLSearchParams): Partial<SearchC
     pickupLocationId: params.get('pickup') ?? undefined,
     dropoffLocationId: params.get('dropoff') ?? undefined,
     pickupTime: params.get('ptime') ?? undefined,
-    returnTime: params.get('rtime') ?? undefined,
   }
 }
 

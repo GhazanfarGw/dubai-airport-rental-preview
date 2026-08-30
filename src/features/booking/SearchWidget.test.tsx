@@ -116,7 +116,7 @@ describe('SearchWidget', () => {
     expect(onSearch).not.toHaveBeenCalled()
   })
 
-  it('calls onSearch with the entered criteria (same return location, default times) once the form is valid', async () => {
+  it('calls onSearch with the entered criteria (same return location, default pickup time) once the form is valid', async () => {
     const onSearch = vi.fn()
     const user = userEvent.setup()
     render(<SearchWidget onSearch={onSearch} />)
@@ -141,7 +141,6 @@ describe('SearchWidget', () => {
         pickupLocationId: 'loc-airport',
         dropoffLocationId: 'loc-airport',
         pickupTime: '10:00',
-        returnTime: '10:00',
       }),
     )
   })
@@ -174,7 +173,6 @@ describe('SearchWidget', () => {
         pickupLocationId: 'loc-airport',
         dropoffLocationId: 'loc-auh-airport',
         pickupTime: '10:00',
-        returnTime: '10:00',
       }),
     )
   })

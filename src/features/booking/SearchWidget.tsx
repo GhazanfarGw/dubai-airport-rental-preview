@@ -23,19 +23,18 @@ import type { Location, SearchCriteria } from '@/types/domain'
  *
  * Layout: a flat row of individually-labelled fields (Pickup City, Pickup
  * Location, an optional Return Location, the pickup/return date range,
- * Search) — flexbox, not a grid, so the row wraps naturally full-width
- * per field on narrow screens and lays out as one line on wider ones.
- * Nothing here scrolls horizontally, in either layout — a field set too
- * wide for the viewport wraps onto another line instead. Pickup/Return
- * Time sit on their own line below the main row (never inside it), then
- * the "Same Return Location" checkbox. Checked by default, the checkbox
- * hides the Return Location field entirely and reuses the pickup point
- * for drop-off, matching a standard one-city round trip; unchecking it
+ * Pickup Time, Search) — flexbox, not a grid, so the row wraps naturally
+ * full-width per field on narrow screens and lays out as one line on
+ * wider ones; nothing here ever scrolls horizontally. Then the "Same
+ * Return Location" checkbox. Checked by default, the checkbox hides the
+ * Return Location field entirely and reuses the pickup point for
+ * drop-off, matching a standard one-city round trip; unchecking it
  * reveals a single Return Location field that searches every UAE location
  * directly (no separate return-city step), enabling a one-way rental.
- * Pickup/Return Time are informational only — see src/lib/timeOptions.ts
- * — and never touch date validation, availability, or pricing, all of
- * which remain delegated to dateRange.ts unchanged.
+ * Pickup Time is informational only — see src/lib/timeOptions.ts — and
+ * never touches date validation, availability, or pricing, all of which
+ * remain delegated to dateRange.ts unchanged. There is deliberately no
+ * Return Time field: only the pickup time is customer-facing here.
  */
 const UAE = 'United Arab Emirates'
 const DEFAULT_CITY = 'Dubai'
@@ -74,7 +73,6 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
     !initialValues?.dropoffLocationId || initialValues.dropoffLocationId === initialValues?.pickupLocationId,
   )
   const [pickupTime, setPickupTime] = useState(initialValues?.pickupTime ?? DEFAULT_TIME)
-  const [returnTime, setReturnTime] = useState(initialValues?.returnTime ?? DEFAULT_TIME)
   const [touched, setTouched] = useState(false)
 
   useEffect(() => {
@@ -123,7 +121,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
     e.preventDefault()
     setTouched(true)
     if (!canSubmit) return
-    onSearch({ startDate, endDate, pickupLocationId, dropoffLocationId, pickupTime, returnTime })
+    onSearch({ startDate, endDate, pickupLocationId, dropoffLocationId, pickupTime })
   }
 
   const todayIso = new Date().toISOString().slice(0, 10)
@@ -188,12 +186,6 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
           />
         </div>
 
-        <Button type="submit" fullWidthOnMobile={!fieldRow} className={fieldRow ? 'mb-px shrink-0' : undefined}>
-          {t('searchWidget.searchCars')}
-        </Button>
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-end gap-3">
         <TimeSelect
           label={t('searchWidget.pickupTime')}
           ariaLabel={t('searchWidget.pickupTime')}
@@ -201,13 +193,10 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
           onChange={setPickupTime}
           row={fieldRow}
         />
-        <TimeSelect
-          label={t('searchWidget.returnTime')}
-          ariaLabel={t('searchWidget.returnTime')}
-          value={returnTime}
-          onChange={setReturnTime}
-          row={fieldRow}
-        />
+
+        <Button type="submit" fullWidthOnMobile={!fieldRow} className={fieldRow ? 'mb-px shrink-0' : undefined}>
+          {t('searchWidget.searchCars')}
+        </Button>
       </div>
 
       <label className="mt-3 flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600">

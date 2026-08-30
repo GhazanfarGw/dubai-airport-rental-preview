@@ -88,7 +88,6 @@ describe('BookingSearchSection', () => {
         pickupLocationId: 'loc-airport',
         dropoffLocationId: 'loc-airport',
         pickupTime: '10:00',
-        returnTime: '10:00',
       }),
     )
   })
