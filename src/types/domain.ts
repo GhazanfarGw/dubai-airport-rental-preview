@@ -45,6 +45,16 @@ export interface SearchCriteria {
   endDate: string
   pickupLocationId: string
   dropoffLocationId: string
+  /**
+   * Optional pickup/return time-of-day ("HH:mm", 24h), carried through the
+   * search bar and checkout draft purely as customer-facing/ops metadata —
+   * see src/lib/timeOptions.ts. Neither field is used by availability,
+   * the no-overlap exclusion constraint, or pricing (both stay day-count
+   * based, unchanged), and neither is required for a criteria to be
+   * "complete" (see isCompleteCriteria in searchParams.ts).
+   */
+  pickupTime?: string
+  returnTime?: string
 }
 
 export interface VehicleFilters {

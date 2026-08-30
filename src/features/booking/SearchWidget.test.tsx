@@ -1,7 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SearchWidget } from '@/features/booking/SearchWidget'
+
+/** Dates relative to "today" — resilient to whenever these tests actually
+ *  run, unlike a hardcoded future date. Mirrors the same helper in
+ *  `DateRangePicker.test.tsx`. */
+function futureIso(offsetDays: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() + offsetDays)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/** The calendar's day buttons are labelled with their full accessible date (see DateRangePicker.tsx). */
+function fullDateLabel(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Intl.DateTimeFormat('en', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    calendar: 'gregory',
+    numberingSystem: 'latn',
+  }).format(new Date(y, m - 1, d))
+}
+
+/** Opens a location picker sheet (by its placeholder/current-value button text) and clicks a named option inside it. */
+async function pickLocation(user: ReturnType<typeof userEvent.setup>, triggerName: RegExp, optionName: RegExp) {
+  await user.click(screen.getByRole('button', { name: triggerName }))
+  const dialog = screen.getByRole('dialog')
+  await user.click(within(dialog).getByRole('button', { name: optionName }))
+}
 
 vi.mock('@/features/booking/api', () => ({
   fetchLocations: vi.fn().mockResolvedValue([
@@ -43,41 +72,43 @@ describe('SearchWidget', () => {
     vi.clearAllMocks()
   })
 
-  it('loads and shows pickup/drop-off locations from the API', async () => {
-    render(<SearchWidget onSearch={vi.fn()} />)
-    const pickupSelect = await screen.findByLabelText(/pickup location/i)
-    expect(within(pickupSelect).getByRole('option', { name: /DXB Terminal 3/ })).toBeInTheDocument()
-    // Pickup Location Type defaults to "Airport" (first in the fixed
-    // display order) — the city-type Downtown Dubai point shouldn't show
-    // up as a pickup option until the customer switches Location Type.
-    expect(within(pickupSelect).queryByRole('option', { name: /Downtown Dubai/ })).not.toBeInTheDocument()
-
-    const dropoffSelect = screen.getByLabelText(/drop-off location/i)
-    expect(within(dropoffSelect).getByRole('option', { name: /DXB Terminal 3/ })).toBeInTheDocument()
-    expect(within(dropoffSelect).getByRole('option', { name: /Downtown Dubai/ })).toBeInTheDocument()
-  })
-
-  it('filters pickup/drop-off options by the selected pickup city', async () => {
+  it('loads and shows every Dubai location (any type) in the Pickup picker', async () => {
     const user = userEvent.setup()
     render(<SearchWidget onSearch={vi.fn()} />)
-    const pickupSelect = await screen.findByLabelText(/pickup location/i)
-    const dropoffSelect = screen.getByLabelText(/drop-off location/i)
+    await screen.findByRole('button', { name: /select pickup point/i })
 
-    // Dubai is the default city — the Abu Dhabi airport isn't offered yet.
-    expect(within(pickupSelect).queryByRole('option', { name: /abu dhabi/i })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /select pickup point/i }))
+    const pickupDialog = screen.getByRole('dialog')
+    expect(within(pickupDialog).getByRole('button', { name: /DXB Terminal 3/ })).toBeInTheDocument()
+    expect(within(pickupDialog).getByRole('button', { name: /Downtown Dubai/ })).toBeInTheDocument()
+  })
 
-    await user.selectOptions(screen.getByLabelText(/pickup city/i), 'Abu Dhabi')
+  it('defaults to "Same Return Location" checked, hiding the Return Location field entirely', async () => {
+    render(<SearchWidget onSearch={vi.fn()} />)
+    await screen.findByRole('button', { name: /select pickup point/i })
 
-    expect(within(pickupSelect).getByRole('option', { name: /Abu Dhabi International Airport \(AUH\)/ })).toBeInTheDocument()
-    expect(within(pickupSelect).queryByRole('option', { name: /DXB Terminal 3/ })).not.toBeInTheDocument()
-    expect(within(dropoffSelect).queryByRole('option', { name: /DXB Terminal 3/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: /same return location/i })).toBeChecked()
+    expect(screen.queryByRole('button', { name: /select return point/i })).not.toBeInTheDocument()
+  })
+
+  it('unchecking "Same Return Location" reveals a Return Location field spanning every UAE location, not just the pickup city', async () => {
+    const user = userEvent.setup()
+    render(<SearchWidget onSearch={vi.fn()} />)
+    await screen.findByRole('button', { name: /select pickup point/i })
+
+    // Pickup stays in Dubai; unchecking should still offer the Abu Dhabi point as a return option.
+    await user.click(screen.getByRole('checkbox', { name: /same return location/i }))
+    await user.click(screen.getByRole('button', { name: /select return point/i }))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByRole('button', { name: /Abu Dhabi International Airport \(AUH\)/ })).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: /DXB Terminal 3/ })).toBeInTheDocument()
   })
 
   it('shows a validation message and does not call onSearch when submitted empty', async () => {
     const onSearch = vi.fn()
     const user = userEvent.setup()
     render(<SearchWidget onSearch={onSearch} />)
-    await screen.findByLabelText(/pickup location/i)
+    await screen.findByRole('button', { name: /select pickup point/i })
 
     await user.click(screen.getByRole('button', { name: /search cars/i }))
 
@@ -85,25 +116,65 @@ describe('SearchWidget', () => {
     expect(onSearch).not.toHaveBeenCalled()
   })
 
-  it('calls onSearch with the entered criteria once the form is valid', async () => {
+  it('calls onSearch with the entered criteria (same return location, default times) once the form is valid', async () => {
     const onSearch = vi.fn()
     const user = userEvent.setup()
     render(<SearchWidget onSearch={onSearch} />)
-    await screen.findByLabelText(/pickup location/i)
+    await screen.findByRole('button', { name: /select pickup point/i })
 
-    fireEvent.change(screen.getByLabelText(/pickup date/i), { target: { value: '2026-09-12' } })
-    fireEvent.change(screen.getByLabelText(/drop-off date/i), { target: { value: '2026-09-15' } })
-    await user.selectOptions(screen.getByLabelText(/pickup location/i), 'loc-airport')
-    await user.selectOptions(screen.getByLabelText(/drop-off location/i), 'loc-city')
+    const startIso = futureIso(2)
+    const endIso = futureIso(5)
+    await user.click(document.querySelector('button[aria-haspopup="dialog"]') as HTMLElement)
+    const dialog = screen.getByRole('dialog')
+    await user.click(within(dialog).getByRole('button', { name: fullDateLabel(startIso) }))
+    await user.click(within(dialog).getByRole('button', { name: fullDateLabel(endIso) }))
+    await user.click(within(dialog).getByRole('button', { name: 'Done' }))
+
+    await pickLocation(user, /select pickup point/i, /DXB Terminal 3/)
 
     await user.click(screen.getByRole('button', { name: /search cars/i }))
 
     await waitFor(() =>
       expect(onSearch).toHaveBeenCalledWith({
-        startDate: '2026-09-12',
-        endDate: '2026-09-15',
+        startDate: startIso,
+        endDate: endIso,
         pickupLocationId: 'loc-airport',
-        dropoffLocationId: 'loc-city',
+        dropoffLocationId: 'loc-airport',
+        pickupTime: '10:00',
+        returnTime: '10:00',
+      }),
+    )
+  })
+
+  it('calls onSearch with an independent drop-off location once "Same Return Location" is unchecked', async () => {
+    const onSearch = vi.fn()
+    const user = userEvent.setup()
+    render(<SearchWidget onSearch={onSearch} />)
+    await screen.findByRole('button', { name: /select pickup point/i })
+
+    const startIso = futureIso(2)
+    const endIso = futureIso(5)
+    await user.click(document.querySelector('button[aria-haspopup="dialog"]') as HTMLElement)
+    const dialog = screen.getByRole('dialog')
+    await user.click(within(dialog).getByRole('button', { name: fullDateLabel(startIso) }))
+    await user.click(within(dialog).getByRole('button', { name: fullDateLabel(endIso) }))
+    await user.click(within(dialog).getByRole('button', { name: 'Done' }))
+
+    await pickLocation(user, /select pickup point/i, /DXB Terminal 3/)
+
+    await user.click(screen.getByRole('checkbox', { name: /same return location/i }))
+    await pickLocation(user, /select return point/i, /Abu Dhabi International Airport \(AUH\)/)
+
+    await user.click(screen.getByRole('button', { name: /search cars/i }))
+
+    await waitFor(() =>
+      expect(onSearch).toHaveBeenCalledWith({
+        startDate: startIso,
+        endDate: endIso,
+        pickupLocationId: 'loc-airport',
+        dropoffLocationId: 'loc-auh-airport',
+        pickupTime: '10:00',
+        returnTime: '10:00',
       }),
     )
   })

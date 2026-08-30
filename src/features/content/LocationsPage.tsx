@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { fetchLocations } from '@/features/booking/api'
+import { TYPE_ORDER, TYPE_ICON, sortByOrder } from '@/features/booking/locationDisplay'
 import type { Location } from '@/types/domain'
 import type { LocationType } from '@/types/database'
 
 type ViewState = { status: 'loading' } | { status: 'error' } | { status: 'loaded'; locations: Location[] }
 
-/** Same fixed display order as SearchWidget's Pickup Location Type selector. */
-const TYPE_ORDER: LocationType[] = ['airport', 'city', 'hotel', 'delivery']
-const TYPE_ICON: Record<LocationType, string> = { airport: '✈', city: '🏙', hotel: '🏨', delivery: '🚚' }
 const TYPE_HEADING_KEY: Record<LocationType, string> = {
   airport: 'pages.locations.airportHeading',
   city: 'pages.locations.cityHeading',
@@ -54,9 +52,7 @@ export function LocationsPage() {
   const locations = state.status === 'loaded' ? state.locations : []
   // Dubai first (primary market), then the rest alphabetically — same
   // ordering rule as SearchWidget's Pickup City selector.
-  const cityNames = Array.from(new Set(locations.map((l) => l.city))).sort((a, b) =>
-    a === 'Dubai' ? -1 : b === 'Dubai' ? 1 : a.localeCompare(b),
-  )
+  const cityNames = Array.from(new Set(locations.map((l) => l.city))).sort((a, b) => sortByOrder(a, b, 'Dubai'))
   const isEmpty = state.status === 'loaded' && locations.length === 0
 
   return (
