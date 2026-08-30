@@ -6,7 +6,7 @@ import { useAdminAuth } from '@/features/admin/AdminAuthContext'
 
 export function AdminLoginPage() {
   const { t } = useTranslation()
-  const { session, adminProfile, loading, notAuthorized, signOut, refreshProfile } = useAdminAuth()
+  const { session, adminProfile, loading, notAuthorized, suspended, signOut, refreshProfile } = useAdminAuth()
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -15,7 +15,7 @@ export function AdminLoginPage() {
 
   const redirectTo = (location.state as { from?: string } | null)?.from ?? '/admin'
 
-  if (!loading && session && adminProfile) {
+  if (!loading && session && adminProfile && !suspended) {
     return <Navigate to={redirectTo} replace />
   }
 
@@ -53,6 +53,19 @@ export function AdminLoginPage() {
         {notAuthorized && (
           <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             <p className="font-medium">{t('admin.login.notAuthorized')}</p>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="mt-1 font-semibold underline"
+            >
+              {t('admin.login.tryDifferentAccount')}
+            </button>
+          </div>
+        )}
+
+        {suspended && (
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            <p className="font-medium">{t('admin.login.suspended')}</p>
             <button
               type="button"
               onClick={() => void signOut()}

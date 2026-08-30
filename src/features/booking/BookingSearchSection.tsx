@@ -22,7 +22,7 @@ export function BookingSearchSection({ onSearch }: BookingSearchSectionProps) {
       className="relative z-10 -mt-10 scroll-mt-20 sm:-mt-14"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-white p-5 shadow-xl shadow-brand-navy/10 sm:p-8">
+        <div className="rounded-2xl bg-white p-5 shadow-md sm:p-8">
           <div className="max-w-xl">
             <h2 className="text-xl font-bold text-brand-navy sm:text-2xl">{t('home.booking.title')}</h2>
             <p className="mt-1.5 text-sm text-slate-600">{t('home.booking.subtitle')}</p>

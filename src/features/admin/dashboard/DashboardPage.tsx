@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { fetchDashboardKpis, fetchRecentActivity, AdminApiError, type DashboardKpis, type RecentActivity } from '@/features/admin/adminApi'
+import { useAdminAuth } from '@/features/admin/AdminAuthContext'
 import { AdminPageHeader } from '@/features/admin/shared/AdminPageHeader'
 import { AdminStatusBadge } from '@/features/admin/shared/AdminStatusBadge'
 import { RevenueSection } from '@/features/admin/dashboard/RevenueSection'
@@ -14,6 +15,8 @@ type LoadState =
 
 export function DashboardPage() {
   const { t } = useTranslation()
+  const { adminProfile } = useAdminAuth()
+  const isSuperAdmin = adminProfile?.role === 'super_admin'
   const [state, setState] = useState<LoadState>({ status: 'loading' })
 
   useEffect(() => {
@@ -36,9 +39,17 @@ export function DashboardPage() {
     <div>
       <AdminPageHeader title={t('admin.nav.dashboard')} description={t('admin.dashboard.subtitle')} />
 
-      <div className="mb-8">
-        <RevenueSection />
-      </div>
+      <p className="-mt-4 mb-6 text-sm text-brand-navy/70">
+        {isSuperAdmin
+          ? t('admin.dashboard.greeting.super_admin', { name: adminProfile?.full_name })
+          : t('admin.dashboard.greeting.staff', { name: adminProfile?.full_name })}
+      </p>
+
+      {isSuperAdmin && (
+        <div className="mb-8">
+          <RevenueSection />
+        </div>
+      )}
 
       {state.status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16">

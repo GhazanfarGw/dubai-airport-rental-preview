@@ -70,6 +70,12 @@ export function ConfirmationPage() {
           <li>• {t('checkout.confirmation.next2')}</li>
           <li>• {t('checkout.confirmation.next3')}</li>
           <li>• {t('checkout.confirmation.next4')}</li>
+          <li>
+            • {t('checkout.confirmation.next5Prefix')}{' '}
+            <Link to="/manage-booking" className="font-semibold text-brand-navy underline">
+              {t('checkout.confirmation.next5Link')}
+            </Link>
+          </li>
         </ul>
       </div>
 

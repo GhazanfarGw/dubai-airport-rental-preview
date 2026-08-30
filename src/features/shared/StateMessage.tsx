@@ -4,28 +4,30 @@ interface StateMessageProps {
   title: string
   body?: string
   action?: ReactNode
-  tone?: 'neutral' | 'error'
+  /**
+   * Phase 8 added `'success'`, additive — every existing call site only
+   * ever passed `'neutral'` or `'error'` (or omitted `tone` for the
+   * `'neutral'` default), so this is a pure extension, not a change to
+   * either of those two. `'success'` replaces the three independently
+   * hand-built "success panel" treatments found in ExtendRentalSection,
+   * ConfirmationPage, and ContactPage (Phase 8 audit, section 1.1).
+   */
+  tone?: 'neutral' | 'error' | 'success'
 }
 
-/** One consistent look for every loading/empty/error state across the site. */
+const TONE_CLASSES: Record<NonNullable<StateMessageProps['tone']>, { box: string; title: string; body: string }> = {
+  neutral: { box: 'border-brand-navy/10 bg-brand-lavender/40', title: 'text-brand-navy', body: 'text-slate-600' },
+  error: { box: 'border-error/30 bg-error-bg', title: 'text-error', body: 'text-error' },
+  success: { box: 'border-success/30 bg-success-bg', title: 'text-success', body: 'text-success' },
+}
+
+/** One consistent look for every loading/empty/error/success state across the site. */
 export function StateMessage({ title, body, action, tone = 'neutral' }: StateMessageProps) {
+  const classes = TONE_CLASSES[tone]
   return (
-    <div
-      className={
-        'mx-auto flex max-w-md flex-col items-center rounded-2xl border px-6 py-12 text-center ' +
-        (tone === 'error'
-          ? 'border-red-200 bg-red-50'
-          : 'border-brand-navy/10 bg-brand-lavender/40')
-      }
-    >
-      <h3 className={'text-base font-semibold ' + (tone === 'error' ? 'text-red-800' : 'text-brand-navy')}>
-        {title}
-      </h3>
-      {body && (
-        <p className={'mt-2 text-sm ' + (tone === 'error' ? 'text-red-700' : 'text-slate-600')}>
-          {body}
-        </p>
-      )}
+    <div className={'mx-auto flex max-w-md flex-col items-center rounded-2xl border px-6 py-12 text-center ' + classes.box}>
+      <h3 className={'text-base font-semibold ' + classes.title}>{title}</h3>
+      {body && <p className={'mt-2 text-sm ' + classes.body}>{body}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   )

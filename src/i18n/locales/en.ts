@@ -6,8 +6,9 @@
  */
 const en = {
   common: {
-    dubaiOnly: 'Dubai Only',
+    dubaiOnly: 'UAE Airport Rentals',
     back: 'Back',
+    close: 'Close',
     loading: 'Loading…',
     currency: 'AED',
     day: 'day',
@@ -17,21 +18,36 @@ const en = {
     brand: 'Bliss Rent',
     home: 'Home',
     browseFleet: 'Browse Fleet',
+    carTypes: 'Car Types',
     about: 'About',
     services: 'Services',
+    contact: 'Contact',
     searchCars: 'Search Cars',
     language: 'العربية',
     toggleMenu: 'Toggle menu',
+    switchLanguage: 'Switch language',
   },
   footer: {
-    tagline: 'Airport pickup, Dubai-wide drop-off. A fleet for every itinerary and budget, booked directly on our website — bliss.rent.',
+    tagline: 'Airport pickup, city-wide drop-off across the UAE cities we serve. A fleet for every itinerary and budget, booked directly on our website — bliss.rent.',
     quickLinks: 'Quick links',
     goodToKnow: 'Good to know',
-    knowDubaiOnly: 'Dubai coverage only — no other emirates at this stage.',
+    knowDubaiOnly: 'Coverage varies by city — see our Locations page for where we currently operate.',
     knowWebsiteOnly: 'Bookings are made on this website only.',
     knowOwnDriver: 'You provide your own driver for the rental.',
     copyright: 'Bliss Rent. All rights reserved.',
-    manageBooking: 'Manage Booking',
+    manageBooking: 'Booking Status',
+    company: 'Company',
+    aboutUs: 'About Us',
+    carTypes: 'Car Types',
+    contactUs: 'Contact Us',
+    legal: 'Legal',
+    privacyPolicy: 'Privacy Policy',
+    cookiePolicy: 'Cookie Policy',
+    bookingTerms: 'Booking Terms & Conditions',
+    followUs: 'Follow us',
+    weAccept: 'We accept',
+    locations: 'Locations',
+    faqs: 'FAQs',
   },
   hero: {
     slides: [
@@ -41,7 +57,7 @@ const en = {
       },
       {
         title: 'Airport pickup, city-wide drop-off',
-        body: 'Land, collect your car, and go. Return anywhere in Dubai.',
+        body: 'Land, collect your car, and go. Return anywhere in the city.',
       },
       {
         title: 'Book online in minutes',
@@ -56,8 +72,8 @@ const en = {
         body: 'Sports and premium vehicles for the trips that deserve something special.',
       },
     ],
-    heading: 'Car rental at Dubai Airport, sorted before you land.',
-    body: 'Search live availability, pick your car, and book online in minutes. Airport pickup, drop-off anywhere in Dubai.',
+    heading: 'Car rental at UAE airports, sorted before you land.',
+    body: 'Search live availability, pick your car, and book online in minutes. Airport pickup, drop-off anywhere in the city.',
     cta: 'Search Cars',
     slideAlt: {
       economy: 'A silver economy hatchback parked along a Dubai waterfront promenade at sunset, with the city skyline behind it.',
@@ -74,24 +90,70 @@ const en = {
     },
   },
   home: {
+    brands: {
+      title: 'Brands in our fleet',
+      subtitle: 'A cross-section of the makes you can find on Bliss Rent, from everyday economy to premium.',
+      note: 'Exact makes and models depend on live availability.',
+      items: [
+        'Toyota',
+        'Nissan',
+        'Hyundai',
+        'Kia',
+        'Chevrolet',
+        'Ford',
+        'Mercedes-Benz',
+        'BMW',
+        'Audi',
+        'Land Rover',
+        'Lexus',
+        'Genesis',
+      ],
+    },
+    locationsPreview: {
+      eyebrow: 'Pickup & drop-off',
+      title: 'Pick up and return your car anywhere we operate',
+      subtitle: 'A snapshot of our active pickup and drop-off points — see the full list and choose yours when you search for a car.',
+      loading: 'Loading locations…',
+      emptyBody: 'Locations are added and updated live — search available cars to see current pickup and drop-off options.',
+      viewAll: 'View all locations',
+    },
+    requirements: {
+      eyebrow: 'Before you book',
+      title: 'What you need to rent a car in the UAE',
+      subtitle: "A quick checklist so there are no surprises at pickup.",
+      items: [
+        {
+          title: 'Age',
+          body: 'The driver must be at least 18 years old at the start of the rental.',
+        },
+        {
+          title: 'Driving license',
+          body: "A valid driving license is required, valid through the end of the rental. Visitors should also carry an International Driving Permit (IDP) if their license requires one to drive in the UAE.",
+        },
+        {
+          title: 'Pickup & drop-off',
+          body: 'Collect your car at the airport and return it anywhere across the city — no counters, no delays.',
+        },
+      ],
+    },
     booking: {
       title: 'Find your car',
-      subtitle: 'Choose your dates and Dubai pickup/drop-off points to see live availability.',
+      subtitle: 'Choose your dates and pickup/drop-off points to see live availability.',
     },
     stickyBar: {
       label: 'Quick search',
     },
     whyChoose: {
       title: 'Why choose Bliss Rent',
-      subtitle: 'A straightforward way to rent a car in Dubai.',
+      subtitle: 'A straightforward way to rent a car across the UAE.',
       items: [
         {
           title: 'Simple online booking',
           body: 'Search, compare, and book your car directly on our website — no calls or messages needed.',
         },
         {
-          title: 'Built for Dubai',
-          body: 'Airport pickup and drop-off anywhere across the city — this is a Dubai-only rental service.',
+          title: 'Built city by city',
+          body: 'Airport pickup and drop-off anywhere across the city, in every city we currently serve — see our Locations page for the live list.',
         },
         {
           title: 'Flexible rental periods',
@@ -120,7 +182,7 @@ const en = {
       steps: [
         {
           title: 'Choose dates & location',
-          body: 'Pick your pickup and drop-off dates and Dubai locations.',
+          body: 'Pick your pickup and drop-off dates and locations.',
         },
         {
           title: 'Select your vehicle',
@@ -138,6 +200,9 @@ const en = {
     },
   },
   searchWidget: {
+    pickupCountry: 'Country',
+    pickupCity: 'Pickup city',
+    pickupType: 'Location type',
     pickupDate: 'Pickup date',
     dropoffDate: 'Drop-off date',
     pickupLocation: 'Pickup location',
@@ -148,6 +213,18 @@ const en = {
     searchCars: 'Search Cars',
     bothLocationsRequired: 'Please choose both a pickup and a drop-off location.',
     couldNotLoadLocations: "Couldn't load pickup/drop-off locations:",
+    type: {
+      airport: 'Airport',
+      city: 'City / Area',
+      hotel: 'Hotel / Accommodation',
+      delivery: 'Delivery',
+    },
+    chooseCity: 'Choose pickup city',
+    choosePickupLocation: 'Pickup location',
+    chooseDropoffLocation: 'Drop-off location',
+    searchLocations: 'Search locations…',
+    noMatches: 'No matching locations.',
+    changeCity: 'Change city',
   },
   searchResults: {
     title: 'Available cars',
@@ -157,7 +234,7 @@ const en = {
     noVehiclesTitle: 'No cars available for these dates',
     noVehiclesBody: 'Try different dates, or check back soon — our fleet is updated regularly.',
     invalidSearchTitle: 'Please check your search',
-    invalidSearchBody: 'Choose valid pickup/drop-off dates and Dubai locations to see available cars.',
+    invalidSearchBody: 'Choose valid pickup/drop-off dates and locations to see available cars.',
     browsingAllHint: 'Showing all cars in our fleet. Add your pickup/drop-off dates above to check availability and see exact pricing.',
     backToHome: 'Back to home',
     errorTitle: 'Something went wrong',
@@ -220,7 +297,7 @@ const en = {
   checkout: {
     steps: ['Customer', 'Driver', 'Summary', 'Payment', 'Confirmation'],
     missingCriteriaTitle: 'We need your dates and locations first',
-    missingCriteriaBody: 'Please choose your rental dates and Dubai pickup/drop-off points before continuing to booking.',
+    missingCriteriaBody: 'Please choose your rental dates and pickup/drop-off points before continuing to booking.',
     backToVehicle: 'Back to vehicle details',
     notFoundTitle: "We couldn't find that car",
     notFoundBody: 'It may have been removed from the fleet. Please choose another vehicle.',
@@ -331,6 +408,8 @@ const en = {
       next2: 'Bring a valid driving license and ID for the driver named above to pickup.',
       next3: 'The vehicle has not been handed over yet — this only confirms your booking and payment.',
       next4: 'For any issue with your booking or rental, contact Bliss Rent support via WhatsApp — WhatsApp is used for support only, not for booking.',
+      next5Prefix: 'Need more days, or want to check your booking status later?',
+      next5Link: 'Manage your booking',
       backToHome: 'Back to home',
       checkStatusLaterPrefix: 'On a different device or after closing this tab,',
       checkStatusLaterLink: 'check your booking status here.',
@@ -339,14 +418,30 @@ const en = {
     },
   },
   manageBooking: {
-    title: 'Manage Booking',
-    subtitle: 'Enter your booking reference and the email you booked with to check its status — from any device or browser.',
-    referenceLabel: 'Booking reference',
-    emailLabel: 'Email',
+    title: 'Booking Status',
+    subtitle: 'Enter your booking reference or vehicle plate number to check its status and request extra days — from any device or browser.',
+    queryLabel: 'Vehicle Plate / Booking Reference',
     submit: 'Check status',
     checking: 'Checking…',
-    notFound: "We couldn't find a booking matching that reference and email. Please double-check both and try again.",
+    notFound: "We couldn't find a booking matching that reference or vehicle plate. Please double-check and try again.",
     genericError: 'Something went wrong while looking up your booking. Please try again.',
+  },
+  extendRental: {
+    vehicleNumberLabel: 'Vehicle number (plate)',
+    currentReturnDate: 'Current return date',
+    sectionTitle: 'Extend This Rental',
+    sectionIntro: "Need more days? Pick a new return date below — this doesn't change your booking automatically; our team reviews every request before it's approved.",
+    newReturnDateLabel: 'New return date',
+    daysPreview: '{{count}} extra day requested',
+    daysPreview_other: '{{count}} extra days requested',
+    notInstantNotice: "Submitting this request does not extend your booking instantly. Our team will check availability and pricing, and confirm with you — by website status or WhatsApp — once it's reviewed.",
+    submitButton: 'Submit request',
+    submitting: 'Submitting…',
+    result: {
+      submittedTitle: 'Request submitted',
+      submittedBody: "Thanks — your extension request has been sent to our team for review. We'll confirm availability, pricing, and next steps with you shortly.",
+      lateNote: 'Since your original return date has already passed, a late-extension fee may apply — our team will confirm the amount when reviewing your request.',
+    },
   },
   admin: {
     errorGeneric: 'Something went wrong. Please try again.',
@@ -358,12 +453,18 @@ const en = {
       availability: 'Availability',
       customers: 'Customers',
       payments: 'Payments',
+      extensions: 'Extensions',
       complaints: 'Complaints',
       pricing: 'Pricing',
       auditLog: 'Audit Log',
+      staff: 'Staff Accounts',
       settings: 'Settings',
       signOut: 'Sign out',
       toggleMenu: 'Toggle menu',
+      roleBadge: {
+        super_admin: 'Owner access',
+        staff: 'Team member',
+      },
     },
     login: {
       title: 'Admin sign in',
@@ -375,11 +476,16 @@ const en = {
       errorInvalid: 'Incorrect email or password.',
       errorGeneric: 'Something went wrong signing in. Please try again.',
       notAuthorized: 'This account does not have admin access.',
+      suspended: 'This account has been suspended. Please contact the business owner.',
       tryDifferentAccount: 'Sign out and try a different account',
       staffOnly: 'Staff only. Customers book and manage rentals on the main site.',
     },
     dashboard: {
       subtitle: "An overview of today's bookings, fleet, and operations.",
+      greeting: {
+        super_admin: "Welcome back, {{name}} — here's the full picture of your business today.",
+        staff: "Welcome, {{name}} — thanks for keeping things running. Here's today's overview.",
+      },
       bookingsSection: 'Bookings',
       fleetSection: 'Fleet',
       opsSection: 'Operations',
@@ -466,6 +572,7 @@ const en = {
         rental: 'Rental',
         payment: 'Payment',
         history: 'Status history',
+        extensions: 'Rental extensions',
       },
       pickup: 'Pickup location',
       dropoff: 'Drop-off location',
@@ -564,6 +671,159 @@ const en = {
       emptyBody: 'Payments recorded against bookings will appear here.',
       testProvider: 'Test mode',
     },
+    extensions: {
+      subtitle:
+        'Rental extension requests from customer support (WhatsApp) and from the website self-service flow — every extension checks the exact physical vehicle, never a substitute.',
+      currentRentedCars: {
+        title: 'Current Rented Cars',
+        subtitle: 'Bookings that are actively out with a customer today. Extend one directly — no need to wait for a website or WhatsApp request.',
+        emptyTitle: 'No cars currently rented',
+        emptyBody: 'Bookings that are actively out with a customer today will appear here.',
+        columns: {
+          customer: 'Customer',
+          booking: 'Booking',
+          vehicle: 'Vehicle',
+          plate: 'Plate',
+          currentReturn: 'Current return',
+          status: 'Status',
+          paymentStatus: 'Payment',
+          days: 'Days',
+        },
+        extendButton: 'Extend Rental',
+        panel: {
+          title: 'Extend Rental',
+          currentBookingTitle: 'Current booking',
+          currentReturnLabel: 'Current return',
+          rentalDaysLabel: 'Rental days so far',
+          extensionDaysLabel: 'Extension days',
+          extensionDaysHint: '1 to 30 days',
+          newReturnLabel: 'New return',
+          dailyRateLabel: 'Daily rate',
+          confirmedByLabel: 'Confirmed by',
+          reviewButton: 'Review extension',
+          backButton: 'Back',
+          cancelButton: 'Cancel',
+          confirmTitle: 'Confirm Rental Extension',
+          confirmButton: 'Confirm Extension',
+          confirming: 'Processing…',
+          successTitle: 'Extension completed',
+          successBody: 'Booking {{reference}} now returns on {{date}}.',
+        },
+      },
+      tabs: {
+        all: 'All',
+        requested: 'Awaiting review',
+        pending: 'Pending payment',
+        approved: 'Approved',
+        rejected: 'Rejected',
+        conflict_unresolved: 'Needs manual review',
+      },
+      columns: {
+        customer: 'Customer',
+        booking: 'Booking',
+        vehicle: 'Vehicle',
+        source: 'Source',
+        dates: 'Return date change',
+        days: 'Days',
+        amount: 'Amount',
+        payment: 'Payment',
+        date: 'Requested on',
+      },
+      source: {
+        admin: 'WhatsApp / support',
+        customer: 'Website (self-service)',
+      },
+      emptyTitle: 'No extension requests yet',
+      emptyBody: 'Rental extensions recorded from a booking, or submitted by a customer online, will appear here.',
+      section: {
+        title: 'Rental extensions',
+        intro:
+          'Record a WhatsApp/support-confirmed extension directly below, or review a request the customer already submitted online in the queue above. Neither ever creates a new booking — the original reference stays exactly as it is.',
+        recordButton: 'Record confirmed extension',
+        cancel: 'Cancel',
+        historyTitle: 'Extension history',
+        historyEmpty: 'No extension requests recorded for this booking yet.',
+        notEligible: 'Extensions can only be recorded for a confirmed or active booking.',
+        noVehicle: 'This booking has no vehicle assigned, so an extension cannot be checked or recorded.',
+        reviewTitle: 'Awaiting review',
+        reviewIntro: 'Submitted online by the customer — not yet processed. Nothing about the booking has changed.',
+        reviewButton: 'Review & process',
+        rejectButton: 'Reject',
+        rejectPrompt: 'Reason for rejecting this request (shown to the customer):',
+      },
+      conflict: {
+        notice:
+          'This exact vehicle has a future booking overlapping the requested dates. Processing will try to move that future booking to a suitable replacement vehicle automatically, so this customer can keep their current vehicle.',
+        unresolvedNotice:
+          'No suitable replacement vehicle was found for the conflicting future booking. This needs manual handling — coordinate with the affected customer, free up a vehicle, or reject this request.',
+        resolvedNotice: 'A future booking on this vehicle was automatically moved to vehicle {{plate}} to make room for this extension.',
+        viewReassignment: 'View reassignment details',
+      },
+      form: {
+        title: 'Record confirmed extension request',
+        reviewTitle: 'Process this extension request',
+        requestedReturnDate: 'New return date',
+        supportConfirmedBy: 'Confirmed with customer by',
+        supportConfirmedByPlaceholder: 'e.g. Aisha (support)',
+        supportConfirmedByOptionalNote: 'Optional — this request was already verified by the customer online.',
+        supportConfirmationNote: 'Confirmation note (optional)',
+        supportConfirmationNotePlaceholder: 'e.g. Confirmed on WhatsApp, 2 Sep',
+        paymentMethod: 'Payment method',
+        choosePaymentMethod: 'Choose payment method',
+        paymentMethodCash: 'Cash',
+        paymentMethodOnline: 'Online',
+        cashSuperAdminOnly: 'Only a Super Admin can process a cash-payment extension. Ask a super admin to process this, or use online payment instead.',
+        cashSuperAdminOnlyHint: 'Cash payment is Super-Admin only. Choose online, or ask a super admin to process this one.',
+        checkingAvailability: 'Checking vehicle {{plate}}…',
+        availableMessage: 'Vehicle {{plate}} is available for these dates.',
+        unavailableMessage:
+          'Vehicle {{plate}} is NOT available for these dates. Processing will attempt to reassign the conflicting future booking rather than rejecting this one outright.',
+        availabilityError: 'Could not check availability. You can still submit — the system checks again before approving.',
+        amountLabel: 'Extension amount',
+        pricingNotConfigured:
+          'Extension pricing has not been configured yet. Ask the owner to set a policy in Settings before this can be submitted.',
+        lateNotice: 'This extension is late — the original return date has already passed.',
+        penaltyLabel: 'Late-extension penalty amount',
+        penaltyNotConfigured:
+          'This extension is late and the late-extension penalty has not been configured yet. Ask the owner to set a policy in Settings before this can be submitted.',
+        totalLabel: 'Total to collect',
+        submit: 'Submit extension request',
+        submitting: 'Submitting…',
+      },
+      result: {
+        approvedTitle: 'Extension approved',
+        approvedCashBody: 'Payment recorded as cash. The booking return date has been updated to {{date}}.',
+        approvedOnlineBody:
+          'Recorded — payment is pending online confirmation. The booking return date will update once the payment is confirmed below.',
+        rejectedTitle: 'Extension rejected',
+        conflictUnresolvedTitle: 'Needs manual review',
+        conflictUnresolvedBody: 'No safe replacement vehicle was found automatically. Nothing has changed yet — see the notice above for next steps.',
+        dismiss: 'Done',
+      },
+      table: {
+        dates: 'Return date change',
+        days: 'Days',
+        amount: 'Amount',
+        payment: 'Payment',
+        status: 'Status',
+        confirmedBy: 'Confirmed by',
+        date: 'Recorded',
+        rejectionReason: 'Reason',
+        source: 'Source',
+        late: 'Late',
+        penalty: 'Penalty',
+        total: 'Total',
+      },
+      payment: {
+        markReceived: 'Mark payment received',
+        markFailed: 'Mark payment failed',
+        referenceLabel: 'Payment reference (optional)',
+        confirmReceivedPrompt: 'Confirm this extension payment of {{amount}} was received?',
+        confirmFailedPrompt: 'Mark this extension payment as failed?',
+        yes: 'Yes, confirm',
+        cancel: 'Cancel',
+      },
+    },
     complaints: {
       subtitle: 'Manage complaints and support requests raised by customers.',
       tabs: {
@@ -621,16 +881,114 @@ const en = {
       emptyBody: 'Admin actions will be recorded here as they happen.',
     },
     settings: {
-      subtitle: 'Your account and staff directory.',
+      subtitle: 'Your account and staff access.',
       yourProfile: 'Your profile',
       name: 'Name',
       role: 'Role',
-      staffDirectory: 'Staff directory',
-      staffDirectoryNote: 'Visible to super admins only. New staff accounts are provisioned manually.',
+      staffDirectory: 'Staff accounts',
+      staffDirectoryNote: 'Add new staff logins, and control who can see Revenue & Earnings and the Audit Log.',
+      manageStaff: 'Manage staff accounts',
       roles: {
         super_admin: 'Super admin',
         staff: 'Staff',
       },
+      extensionPricing: {
+        title: 'Extension pricing policy',
+        subtitle: "Owner decision: how a rental extension's amount is calculated. Extensions cannot be processed until a policy is chosen here.",
+        notConfigured: 'Not yet configured — extensions cannot be processed until a policy is chosen.',
+        policyLabel: 'Pricing policy',
+        policyOptions: {
+          unset: 'Not configured',
+          original_rate: "Original booking's daily rate",
+          current_rate: "Vehicle's current daily rate",
+          custom_rate: 'Custom daily rate',
+        },
+        customDailyRateLabel: 'Custom daily rate',
+        customCurrencyLabel: 'Currency',
+        save: 'Save policy',
+        saving: 'Saving…',
+        saved: 'Saved.',
+      },
+      extensionPenalty: {
+        title: 'Late-extension penalty policy',
+        subtitle: 'Owner decision: whether and how a LATE extension (requested after the original return date has already passed) is penalized. A late extension cannot be processed until a policy is chosen here.',
+        notConfigured: 'Not yet configured — a late extension cannot be processed until a policy is chosen.',
+        policyLabel: 'Penalty policy',
+        policyOptions: {
+          unset: 'Not configured',
+          fixed_fee: 'Flat fixed fee',
+          per_day: 'Per late day',
+          percentage: 'Percentage of the extension amount',
+        },
+        fixedFeeLabel: 'Fixed fee amount',
+        perDayLabel: 'Amount per late day',
+        percentageLabel: 'Percentage (%)',
+        currencyLabel: 'Currency',
+        save: 'Save policy',
+        saving: 'Saving…',
+        saved: 'Saved.',
+      },
+      dangerZone: {
+        title: 'Danger zone — testing only',
+        subtitle:
+          'Wipes every booking, payment, complaint, vehicle, customer, and activity log entry so the dashboard is empty for go-live. Cannot be undone. This section will be removed once testing is complete.',
+        button: 'Reset all test data',
+        confirmPrompt: 'Type RESET to permanently delete all bookings, payments, complaints, vehicles, customers, and activity logs.',
+        confirmButton: 'Yes, delete everything',
+        cancel: 'Cancel',
+        resetting: 'Resetting…',
+        done: 'Done — {{count}} rows removed. Refresh the page to see the empty dashboard.',
+      },
+    },
+    staff: {
+      subtitle:
+        'Add team members and control exactly what each account can do. Revenue & Earnings and the Audit Log always stay owner-only, however staff accounts are set up here.',
+      heading: 'Staff accounts',
+      addButton: 'Add staff member',
+      cancel: 'Cancel',
+      form: {
+        title: 'New staff account',
+        fullName: 'Full name',
+        email: 'Email',
+        password: 'Temporary password',
+        generate: 'Generate',
+        show: 'Show',
+        hide: 'Hide',
+        submit: 'Create account',
+        submitting: 'Creating…',
+        note: 'Share this email and password with them directly — there is no automatic invite email yet. They can sign in right away at the admin login page, using this password.',
+      },
+      created: {
+        title: 'Staff account created',
+        body: 'Share these sign-in details with {{name}} directly (there is no automatic invite email yet):',
+        dismiss: 'Done',
+      },
+      table: {
+        nameColumn: 'Name',
+        role: 'Role',
+        status: 'Status',
+        joined: 'Joined',
+        actions: 'Actions',
+        you: 'You',
+      },
+      status: {
+        active: 'Active',
+        suspended: 'Suspended',
+      },
+      actions: {
+        suspend: 'Suspend',
+        reactivate: 'Reactivate',
+        promote: 'Make owner',
+        demote: 'Make staff',
+        confirmSuspend: 'Suspend {{name}}? They will lose dashboard access immediately. This can be reversed any time.',
+        confirmReactivate: 'Reactivate {{name}}? They will regain dashboard access right away.',
+        confirmPromote: 'Make {{name}} an owner? They will gain full access, including Revenue & Earnings and the Audit Log.',
+        confirmDemote: 'Make {{name}} a staff member? They will lose access to Revenue & Earnings and the Audit Log.',
+        yes: 'Yes, confirm',
+        cancel: 'Cancel',
+      },
+      emptyTitle: 'No staff accounts yet',
+      emptyBody: 'Add your first team member above.',
     },
     status: {
       pending_payment: 'Pending payment',
@@ -652,6 +1010,386 @@ const en = {
       maintenance: 'Maintenance',
       unavailable: 'Unavailable',
       retired: 'Retired',
+      approved: 'Approved',
+      rejected: 'Rejected',
+      requested: 'Requested',
+      conflict_unresolved: 'Needs review',
+    },
+  },
+  pages: {
+    draftBannerTitle: 'Draft — pending legal review',
+    about: {
+      title: 'About Bliss Rent',
+      subtitle:
+        "The UAE's straightforward, book-online car rental service — built for travelers who want a car waiting for them, not a phone call to make.",
+      story: {
+        heading: 'Our story',
+        paragraphs: [
+          "Bliss Rent was created to solve one specific problem: renting a car in the UAE shouldn't mean phone tag, back-and-forth messages, or turning up at a counter with no idea what you'll actually drive away in.",
+          'We built a booking website where you can see real cars, real availability, and real pricing — and complete the whole booking yourself, in minutes, before you even land.',
+          "We're expanding city by city rather than spreading thin all at once — concentrating on doing airport pickup and city-wide drop-off properly in each city we add, starting with Dubai and Abu Dhabi.",
+        ],
+      },
+      vision: {
+        heading: 'Our vision',
+        body: 'To be the easiest way to arrange a self-drive car rental across the UAE — a service where booking a car online is as simple, transparent, and fast as booking a hotel room.',
+      },
+      mission: {
+        heading: 'Our mission',
+        body: 'To give every customer clear pricing, a straightforward booking flow, and a well-maintained fleet — with honest communication at every step, from the moment they search to the moment they return the car.',
+      },
+      values: {
+        heading: 'What we stand for',
+        items: [
+          { title: 'Transparency', body: 'The price you see is the price you pay — no hidden fees added at the counter.' },
+          { title: 'Simplicity', body: 'Everything happens on one website: search, book, and pay, without needing an account.' },
+          { title: 'Reliability', body: 'A fleet that is inspected and maintained, so the car you booked is the car you get.' },
+          { title: 'Local focus', body: "We know every city we serve — its airport, its roads, and its pickup points — before we ever list it live." },
+        ],
+      },
+    },
+    carTypes: {
+      title: 'Our Car Types',
+      subtitle: 'From economical daily drivers to flagship luxury, browse the categories in the Bliss Rent fleet.',
+      categories: [
+        {
+          name: 'Economy',
+          tagline: 'Practical and budget-friendly',
+          description:
+            'Compact, fuel-efficient hatchbacks and sedans, ideal for solo travelers or small groups getting around the city on a budget.',
+          idealFor: 'City trips, budget-conscious travelers, short stays',
+        },
+        {
+          name: 'Sedan / Business',
+          tagline: 'Comfortable and professional',
+          description:
+            'Mid-size and executive sedans with extra comfort and boot space, suited to business travel or small families.',
+          idealFor: 'Business trips, families, longer rentals',
+        },
+        {
+          name: 'SUV',
+          tagline: 'Space and confidence',
+          description:
+            'Higher ground clearance with more seating and luggage room, for groups, families, or trips outside the city.',
+          idealFor: 'Groups, families, desert or highway drives',
+        },
+        {
+          name: 'Luxury',
+          tagline: 'Arrive in style',
+          description:
+            'Premium and flagship vehicles for special occasions, business entertaining, or simply arriving the way you want to.',
+          idealFor: 'Special occasions, executive travel, self-treats',
+        },
+      ],
+      note: "Exact makes, models, and pricing depend on live availability — search your dates to see what's currently in the fleet.",
+      cta: 'Browse Available Cars',
+    },
+    locations: {
+      title: 'Pickup & Drop-off Locations',
+      subtitle:
+        'Collect your car at the airport, then return it anywhere across the city. See the cities and pickup points we currently operate below — coverage expands city by city, and there is no delivery-to-your-door service at this stage.',
+      airportHeading: 'Airport pickup',
+      cityHeading: 'City drop-off points',
+      hotelHeading: 'Hotel / accommodation delivery',
+      deliveryHeading: 'Delivery',
+      loading: 'Loading locations…',
+      emptyTitle: 'Locations are being added',
+      emptyBody: 'Our pickup and drop-off points are managed live and updated regularly — check back soon, or search available cars to see current options.',
+      note: 'Choose your exact pickup and drop-off points when you search for a car — availability is shown live.',
+      cta: 'Search Cars',
+    },
+    faqs: {
+      title: 'Frequently Asked Questions',
+      subtitle: 'Quick answers about booking, eligibility, and renting with Bliss Rent.',
+      categories: [
+        {
+          heading: 'Booking & payment',
+          items: [
+            {
+              question: 'Do I need to create an account to book?',
+              answer:
+                "No. Bliss Rent is booking-by-website — you search, book, and pay using just your email, with no account or password needed. You can check your booking status later using your booking reference and email.",
+            },
+            {
+              question: 'How do I pay for my booking?',
+              answer: 'Payment is completed securely online as the last step of checkout, for the full amount shown in your booking summary.',
+            },
+            {
+              question: 'What rental periods are available?',
+              answer: 'Daily, weekly, monthly, and 3-month rentals — pricing for each is shown on the vehicle you choose.',
+            },
+            {
+              question: 'Can I cancel or change my booking?',
+              answer: 'Our cancellation and refund rules are set out in the Booking Terms & Conditions — please check there before booking.',
+            },
+          ],
+        },
+        {
+          heading: 'Eligibility & documents',
+          items: [
+            {
+              question: 'How old do I need to be to rent a car?',
+              answer: 'The driver must be at least 18 years old at the start of the rental.',
+            },
+            {
+              question: 'What documents does the driver need?',
+              answer:
+                "A valid driving license, valid through the end of the rental. Visitors should also carry an International Driving Permit (IDP) if their license requires one to drive in the UAE. Bring the physical license and ID to pickup.",
+            },
+            {
+              question: 'Do you provide a driver?',
+              answer:
+                'No — Bliss Rent is self-drive only. You or someone you choose does the driving; we do not arrange a driver for you.',
+            },
+            {
+              question: 'Is there a mileage limit or fuel policy?',
+              answer: 'Yes — mileage allowance and fuel policy are set out in the Booking Terms & Conditions.',
+            },
+          ],
+        },
+        {
+          heading: 'Pickup, drop-off & support',
+          items: [
+            {
+              question: 'Where can I pick up and drop off my car?',
+              answer: 'Pickup is at the airport in the city you choose, and you can drop off anywhere across that city. See our Locations page for current pickup and drop-off points.',
+            },
+            {
+              question: 'Which cities do you operate in?',
+              answer: "We're live in select UAE cities today and adding more over time — see our Locations page for exactly where we currently operate.",
+            },
+            {
+              question: 'What car categories do you offer?',
+              answer: 'Economy, Sedan/Business, SUV, and Luxury — see our Car Types page for details on each.',
+            },
+            {
+              question: 'What if I have an issue during my rental?',
+              answer: 'Contact our support team via WhatsApp or our Contact Us page — WhatsApp is used for support, not for booking.',
+            },
+          ],
+        },
+      ],
+    },
+    contact: {
+      title: 'Contact Us',
+      subtitle: "Questions about a booking, or something else on your mind? Here's how to reach Bliss Rent.",
+      methods: {
+        whatsapp: {
+          label: 'WhatsApp support',
+          value: '[+971 5X XXX XXXX]',
+          note: 'Fastest way to reach us for anything about an existing booking or rental.',
+        },
+        email: {
+          label: 'Email',
+          value: '[support@bliss.rent]',
+          note: 'For general questions, feedback, or anything not urgent.',
+        },
+        address: {
+          label: 'Office',
+          value: '[Office address, Dubai, UAE]',
+          note: 'Pickup happens at the airport and other agreed points in the cities we serve — this is our office address, not a pickup counter.',
+        },
+        hours: {
+          label: 'Support hours',
+          value: '[e.g. 24/7, or specific hours]',
+          note: '',
+        },
+      },
+      form: {
+        heading: 'Send us a message',
+        name: 'Your name',
+        email: 'Your email',
+        subject: 'Subject',
+        message: 'Message',
+        submit: 'Send message',
+        sending: 'Sending…',
+        success: "Thanks — we've received your message and will get back to you shortly.",
+        note: 'For anything about a rental already in progress, WhatsApp will always be faster than this form.',
+        errorName: 'Please enter your name.',
+        errorEmail: 'Please enter a valid email address.',
+        errorMessage: 'Please enter a message.',
+      },
+      supportNote: 'Bliss Rent bookings are made only on this website. WhatsApp and this contact form are for support, not for booking a car.',
+    },
+    privacyPolicy: {
+      title: 'Privacy Policy',
+      updated: 'Last updated: 27 August 2026',
+      draftNotice:
+        "DRAFT — pending legal review. This page is a standard, plain-language starting point and is not legal advice. Please have a qualified lawyer review and finalize this policy — including applicable UAE data protection rules — before the site goes live.",
+      sections: [
+        {
+          heading: '1. Introduction',
+          paragraphs: [
+            "This Privacy Policy explains what information Bliss Rent ('we', 'us', 'our') collects when you use our website to search for and book a rental car, and how we use, store, and protect that information.",
+          ],
+        },
+        {
+          heading: '2. Information we collect',
+          paragraphs: [
+            "When you make a booking, we collect the contact and driver information needed to complete it, including: your full name, email address, and phone number; and the driver's full name, date of birth, driving license number and expiry date, and issuing country.",
+            'We also automatically collect basic technical information (such as browser type and general usage of the site) to help the site work correctly.',
+          ],
+        },
+        {
+          heading: '3. How we use your information',
+          list: [
+            'To create and manage your booking.',
+            'To contact you about your booking (confirmations, updates, and support).',
+            'To meet our legal and record-keeping obligations.',
+            'To improve our website and services.',
+          ],
+        },
+        {
+          heading: '4. How we store and protect your information',
+          paragraphs: [
+            "Your information is stored using access controls that restrict it to authorized Bliss Rent staff only. Driver's license and ID information, once document upload is available, is stored in a private, non-public storage area.",
+            'Payment card details are handled by our payment provider directly and are not stored on our own servers.',
+          ],
+        },
+        {
+          heading: '5. Who we share information with',
+          paragraphs: [
+            'We do not sell your personal information. We only share it where necessary — for example, with a payment provider to process payment, or where required by law.',
+          ],
+        },
+        {
+          heading: '6. Cookies',
+          paragraphs: ['Our website uses a small number of cookies, described in full in our Cookie Policy.'],
+        },
+        {
+          heading: '7. Your rights',
+          paragraphs: [
+            'You may request access to, correction of, or deletion of your personal information by contacting us at [privacy contact email]. We will respond within a reasonable timeframe.',
+          ],
+        },
+        {
+          heading: '8. Data retention',
+          paragraphs: [
+            'We retain booking and driver information for as long as needed to fulfill the booking and meet our legal and accounting obligations, after which it is deleted or anonymized.',
+          ],
+        },
+        {
+          heading: "9. Children's privacy",
+          paragraphs: [
+            "Bliss Rent's services are intended for adults only. Renting a vehicle requires the driver to meet [minimum driver age] and hold a valid driving license.",
+          ],
+        },
+        {
+          heading: '10. Changes to this policy',
+          paragraphs: ["We may update this policy from time to time. The 'last updated' date above will reflect the most recent version."],
+        },
+        {
+          heading: '11. Contact us',
+          paragraphs: ['For any question about this policy or your information, contact us at [privacy contact email] or through our Contact Us page.'],
+        },
+      ],
+    },
+    cookiePolicy: {
+      title: 'Cookie Policy',
+      updated: 'Last updated: 27 August 2026',
+      draftNotice:
+        'DRAFT — pending legal review. This page is a standard, plain-language starting point and is not legal advice. Please have a qualified lawyer review and finalize this policy before the site goes live.',
+      sections: [
+        {
+          heading: '1. What are cookies',
+          paragraphs: ['Cookies are small text files stored on your device that help a website function and remember your preferences.'],
+        },
+        {
+          heading: '2. Cookies we use',
+          list: [
+            'Essential cookies — required for the website to work, such as remembering your language preference (English/Arabic) and keeping your booking session active while you check out.',
+            'We do not currently use advertising or third-party tracking cookies.',
+          ],
+        },
+        {
+          heading: '3. Managing cookies',
+          paragraphs: [
+            'Most browsers let you control or delete cookies in their settings. Blocking essential cookies may prevent parts of the booking process (like checkout) from working correctly.',
+          ],
+        },
+        {
+          heading: '4. Changes to this policy',
+          paragraphs: ['If the cookies we use change — for example, if analytics cookies are added in future — this page will be updated and the date above will change.'],
+        },
+        {
+          heading: '5. Contact us',
+          paragraphs: ['Questions about cookies can be sent to [privacy contact email] or through our Contact Us page.'],
+        },
+      ],
+    },
+    bookingTerms: {
+      title: 'Booking Terms & Conditions',
+      updated: 'Last updated: 27 August 2026',
+      draftNotice:
+        'DRAFT — pending legal review. This page is a standard, plain-language starting point and is not legal advice. The bracketed fields below need your actual business rules before this is final — please have a qualified lawyer review the complete terms before the site goes live.',
+      intro: 'These terms apply to every booking made through the Bliss Rent website. By completing a booking, you agree to the terms below.',
+      sections: [
+        {
+          heading: '1. Self-drive rental — no driver provided',
+          paragraphs: [
+            "Bliss Rent provides self-drive vehicle rental only. We do not provide a driver. The person named as 'driver' at booking is solely responsible for operating the vehicle safely and legally for the full rental period.",
+          ],
+        },
+        {
+          heading: '2. Driver eligibility',
+          list: [
+            'Minimum driver age: [__]',
+            'Minimum license holding period: [__]',
+            'A valid driving license (and International Driving Permit if applicable) is required, valid through the end of the rental period.',
+          ],
+        },
+        {
+          heading: '3. Booking & payment',
+          paragraphs: [
+            'A booking is confirmed once payment is completed on our website. Prices shown at checkout are the final price for the dates and vehicle selected, unless changed by the customer.',
+            'Security deposit: [__]',
+          ],
+        },
+        {
+          heading: '4. Fuel policy',
+          paragraphs: ['Fuel policy: [__ — e.g. the vehicle is provided with a full tank and must be returned with a full tank].'],
+        },
+        {
+          heading: '5. Mileage',
+          paragraphs: ['Daily/rental-period mileage allowance: [__]. Additional mileage beyond this allowance is charged at [__ per km].'],
+        },
+        {
+          heading: '6. Late return',
+          paragraphs: ['Vehicles must be returned by the agreed date and time. A late return fee of [__] applies per [hour/day] beyond the agreed return time, unless an extension has been agreed in advance.'],
+        },
+        {
+          heading: '7. Cancellations & refunds',
+          paragraphs: ['Cancellation window: [__]. Refund policy: [__ — e.g. full refund if cancelled more than X hours before pickup, partial/no refund thereafter].'],
+        },
+        {
+          heading: '8. Vehicle condition & damage',
+          paragraphs: [
+            "The vehicle must be returned in the same condition as at handover, normal wear and tear excepted. Any damage beyond normal wear and tear during the rental period is the renter's responsibility, up to [__ / the security deposit amount / actual repair cost].",
+          ],
+        },
+        {
+          heading: '9. Prohibited use',
+          list: [
+            'Using the vehicle for any illegal purpose.',
+            'Sub-renting or lending the vehicle to a driver not named on the booking.',
+            'Using the vehicle outside the coverage area agreed at booking (the pickup/drop-off city agreed at booking, unless otherwise agreed).',
+          ],
+        },
+        {
+          heading: '10. Traffic fines & tolls',
+          paragraphs: [
+            "Any traffic fines, Salik (toll) charges, or parking fines incurred during the rental period are the renter's responsibility and may be charged to the payment method on file, plus an administration fee of [__].",
+          ],
+        },
+        {
+          heading: '11. Governing law',
+          paragraphs: ['These terms are governed by the laws of the United Arab Emirates and the Emirate of Dubai.'],
+        },
+        {
+          heading: '12. Contact',
+          paragraphs: ['Questions about these terms can be sent through our Contact Us page.'],
+        },
+      ],
     },
   },
   errors: {
@@ -665,7 +1403,7 @@ const en = {
       VALIDATION_ERROR: 'Please check the highlighted fields and try again.',
       VEHICLE_NOT_FOUND: 'That vehicle could not be found.',
       VEHICLE_UNAVAILABLE: 'This vehicle was just booked for overlapping dates. Please choose another vehicle or date range.',
-      INVALID_LOCATION: 'Please choose a valid Dubai pickup and drop-off point.',
+      INVALID_LOCATION: 'Please choose a valid pickup and drop-off point.',
       NO_PRICING: 'This vehicle has no pricing configured yet and cannot be booked.',
       PAYMENT_NOT_FOUND: 'That payment could not be found.',
       SERVER_ERROR: 'Something went wrong. Please try again.',

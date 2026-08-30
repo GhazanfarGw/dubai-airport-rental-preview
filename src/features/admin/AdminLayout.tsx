@@ -15,9 +15,11 @@ const NAV_ITEMS = [
   { to: '/admin/availability', key: 'availability', end: false },
   { to: '/admin/customers', key: 'customers', end: false },
   { to: '/admin/payments', key: 'payments', end: false },
+  { to: '/admin/extensions', key: 'extensions', end: false },
   { to: '/admin/complaints', key: 'complaints', end: false },
   { to: '/admin/pricing', key: 'pricing', end: false },
-  { to: '/admin/audit-log', key: 'auditLog', end: false },
+  { to: '/admin/audit-log', key: 'auditLog', end: false, superAdminOnly: true },
+  { to: '/admin/staff', key: 'staff', end: false, superAdminOnly: true },
   { to: '/admin/settings', key: 'settings', end: false },
 ] as const
 
@@ -27,6 +29,8 @@ export function AdminLayout() {
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [pendingCount, setPendingCount] = useState<number | null>(null)
+  const isSuperAdmin = adminProfile?.role === 'super_admin'
+  const visibleNavItems = NAV_ITEMS.filter((item) => !('superAdminOnly' in item && item.superAdminOnly) || isSuperAdmin)
 
   useEffect(() => {
     let cancelled = false
@@ -53,10 +57,21 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-brand-lavender/20 text-brand-navy">
-      {/* Sidebar — desktop */}
+    <div className="flex h-screen overflow-hidden bg-brand-lavender/20 text-brand-navy">
+      {/*
+        Sidebar — desktop. Fixed in place: the outer row is h-screen +
+        overflow-hidden, so this column never scrolls with the page. Its own
+        nav list keeps its independent overflow-y-auto (below) in case the
+        menu ever grows taller than the viewport on a short screen.
+      */}
       <aside className="hidden w-60 shrink-0 flex-col border-e border-brand-navy/10 bg-white lg:flex">
-        <SidebarContent adminName={adminProfile?.full_name ?? ''} onSignOut={handleSignOut} pendingCount={pendingCount} />
+        <SidebarContent
+          adminName={adminProfile?.full_name ?? ''}
+          isSuperAdmin={isSuperAdmin}
+          navItems={visibleNavItems}
+          onSignOut={handleSignOut}
+          pendingCount={pendingCount}
+        />
       </aside>
 
       {/* Sidebar — mobile drawer */}
@@ -66,6 +81,8 @@ export function AdminLayout() {
           <aside className="absolute inset-y-0 start-0 flex w-64 flex-col bg-white shadow-xl">
             <SidebarContent
               adminName={adminProfile?.full_name ?? ''}
+              isSuperAdmin={isSuperAdmin}
+              navItems={visibleNavItems}
               onSignOut={handleSignOut}
               onNavigate={() => setMobileOpen(false)}
               pendingCount={pendingCount}
@@ -74,8 +91,8 @@ export function AdminLayout() {
         </div>
       )}
 
-      <div className="flex min-h-screen flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b border-brand-navy/10 bg-white px-4 sm:px-6">
+      <div className="flex h-full flex-1 flex-col overflow-hidden">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-brand-navy/10 bg-white px-4 sm:px-6 lg:justify-end">
           <button
             type="button"
             className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-brand-navy lg:hidden"
@@ -89,10 +106,18 @@ export function AdminLayout() {
           <span className="text-sm font-semibold text-brand-navy lg:hidden">{t('admin.nav.title')}</span>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
+            <button
+              type="button"
+              onClick={() => void handleSignOut()}
+              className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light"
+            >
+              {t('admin.nav.signOut')}
+            </button>
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6">
+        {/* The only scrolling region — sidebar and header stay put, this scrolls independently. */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <Outlet />
         </main>
       </div>
@@ -102,11 +127,15 @@ export function AdminLayout() {
 
 function SidebarContent({
   adminName,
+  isSuperAdmin,
+  navItems,
   onSignOut,
   onNavigate,
   pendingCount,
 }: {
   adminName: string
+  isSuperAdmin: boolean
+  navItems: readonly { to: string; key: string; end: boolean }[]
   onSignOut: () => void
   onNavigate?: () => void
   pendingCount: number | null
@@ -126,7 +155,7 @@ function SidebarContent({
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -144,16 +173,38 @@ function SidebarContent({
       </nav>
 
       <div className="border-t border-brand-navy/10 p-3">
-        <p className="truncate px-2 text-xs text-slate-400">{adminName}</p>
+        <div className="flex items-center justify-between gap-2 px-2">
+          <p className="truncate text-xs text-slate-400">{adminName}</p>
+          <RoleBadge isSuperAdmin={isSuperAdmin} />
+        </div>
         <button
           type="button"
           onClick={onSignOut}
-          className="mt-1 w-full rounded-lg px-3 py-2 text-start text-sm font-medium text-slate-600 transition-colors hover:bg-brand-lavender hover:text-brand-navy"
+          className="mt-2 w-full rounded-lg px-3 py-2 text-start text-sm font-medium text-slate-600 transition-colors hover:bg-brand-lavender hover:text-brand-navy"
         >
           {t('admin.nav.signOut')}
         </button>
       </div>
     </>
+  )
+}
+
+/**
+ * Small identity marker so the two roles read as distinct, not just
+ * "staff minus some buttons" — gold "Owner Access" for super_admin, a
+ * calmer navy "Team Member" pill for staff.
+ */
+function RoleBadge({ isSuperAdmin }: { isSuperAdmin: boolean }) {
+  const { t } = useTranslation()
+  return (
+    <span
+      className={
+        'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ' +
+        (isSuperAdmin ? 'bg-brand-gold/20 text-brand-gold-dark' : 'bg-brand-navy/10 text-brand-navy')
+      }
+    >
+      {isSuperAdmin ? t('admin.nav.roleBadge.super_admin') : t('admin.nav.roleBadge.staff')}
+    </span>
   )
 }
 

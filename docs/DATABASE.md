@@ -15,7 +15,7 @@ the migration file wins.
 | `vehicles` | The fleet. |
 | `vehicle_images` | Public vehicle photos, stored in the `vehicle-images` bucket. |
 | `pricing` | List price vs. client price per vehicle, per rental term (daily/weekly/monthly/3-month). |
-| `locations` | Pickup/drop-off points — airport or city, Dubai only. |
+| `locations` | Pickup/drop-off points — airport or city type, tagged with a `city` column (Dubai, Abu Dhabi — see `docs/ARCHITECTURE.md`'s "Multi-emirate locations" section). |
 | `bookings` | The reservation itself. `booking_channel` is constrained to `'website'`. |
 | `booking_status_history` | Automatic audit trail of every status change (trigger-populated). |
 | `payments` | Payment records tied to a booking. Written by admins/Edge Functions only, never directly by a customer. |

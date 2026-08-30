@@ -17,7 +17,13 @@ export type PricingTerm = 'daily' | 'weekly' | 'monthly' | '3_month'
 export type BookingStatus = 'pending_payment' | 'confirmed' | 'active' | 'completed' | 'cancelled'
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded'
 export type ComplaintStatus = 'open' | 'in_progress' | 'resolved' | 'closed'
-export type LocationType = 'airport' | 'city'
+export type LocationType = 'airport' | 'city' | 'hotel' | 'delivery'
+export type ExtensionStatus = 'requested' | 'pending' | 'approved' | 'rejected' | 'conflict_unresolved'
+export type ExtensionPricingPolicy = 'original_rate' | 'current_rate' | 'custom_rate'
+export type ExtensionPenaltyPolicy = 'fixed_fee' | 'per_day' | 'percentage'
+export type ExtensionSource = 'admin' | 'customer'
+export type NotificationType = 'vehicle_reassigned' | 'extension_approved' | 'extension_rejected' | 'extension_conflict_pending_review'
+export type NotificationDeliveryStatus = 'pending_delivery' | 'sent' | 'failed'
 
 export interface Database {
   public: {
@@ -27,12 +33,14 @@ export interface Database {
           id: string
           full_name: string
           role: AdminRole
+          is_active: boolean
           created_at: string
         }
         Insert: {
           id: string
           full_name: string
           role?: AdminRole
+          is_active?: boolean
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['admin_profiles']['Insert']>
@@ -177,6 +185,12 @@ export interface Database {
           id: string
           name: string
           type: LocationType
+          /** Emirate/city this point is in, e.g. 'Dubai', 'Abu Dhabi' — drives the search widget's Pickup City filter. */
+          city: string
+          /** Country this point is in — free-text like `city`, defaults to 'United Arab Emirates' for every row today. Drives the Country level of the Country → City → Type → Location hierarchy. */
+          country: string
+          /** IATA airport code (e.g. 'DXB', 'AUH') — only set when type = 'airport', null otherwise. */
+          airport_code: string | null
           is_active: boolean
           created_at: string
         }
@@ -184,6 +198,9 @@ export interface Database {
           id?: string
           name: string
           type: LocationType
+          city: string
+          country?: string
+          airport_code?: string | null
           is_active?: boolean
           created_at?: string
         }
@@ -322,6 +339,162 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['audit_logs']['Insert']>
         Relationships: []
       }
+      extension_pricing_settings: {
+        Row: {
+          id: number
+          policy: ExtensionPricingPolicy | null
+          custom_daily_rate: number | null
+          custom_currency: string
+          updated_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          policy?: ExtensionPricingPolicy | null
+          custom_daily_rate?: number | null
+          custom_currency?: string
+          updated_by?: string | null
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['extension_pricing_settings']['Insert']>
+        Relationships: []
+      }
+      booking_extensions: {
+        Row: {
+          id: string
+          booking_id: string
+          vehicle_id: string
+          previous_return_date: string
+          requested_return_date: string
+          extension_days: number
+          availability_confirmed: boolean | null
+          pricing_policy_used: ExtensionPricingPolicy | null
+          amount: number | null
+          currency: string | null
+          payment_method: 'cash' | 'online' | null
+          payment_status: PaymentStatus | null
+          status: ExtensionStatus
+          rejection_reason: string | null
+          support_confirmed_by: string | null
+          support_confirmation_note: string | null
+          processed_by: string | null
+          payment_confirmed_by: string | null
+          source: ExtensionSource
+          is_late: boolean
+          penalty_amount: number | null
+          penalty_policy_used: ExtensionPenaltyPolicy | null
+          penalty_rate_used: number | null
+          conflict_booking_id: string | null
+          replacement_vehicle_id: string | null
+          booking_reference_verified: string | null
+          vehicle_number_verified: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          vehicle_id: string
+          previous_return_date: string
+          requested_return_date: string
+          extension_days: number
+          availability_confirmed?: boolean | null
+          pricing_policy_used?: ExtensionPricingPolicy | null
+          amount?: number | null
+          currency?: string | null
+          payment_method?: 'cash' | 'online' | null
+          payment_status?: PaymentStatus | null
+          status?: ExtensionStatus
+          rejection_reason?: string | null
+          support_confirmed_by?: string | null
+          support_confirmation_note?: string | null
+          processed_by?: string | null
+          payment_confirmed_by?: string | null
+          source?: ExtensionSource
+          is_late?: boolean
+          penalty_amount?: number | null
+          penalty_policy_used?: ExtensionPenaltyPolicy | null
+          penalty_rate_used?: number | null
+          conflict_booking_id?: string | null
+          replacement_vehicle_id?: string | null
+          booking_reference_verified?: string | null
+          vehicle_number_verified?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['booking_extensions']['Insert']>
+        Relationships: []
+      }
+      extension_penalty_settings: {
+        Row: {
+          id: number
+          policy: ExtensionPenaltyPolicy | null
+          fixed_fee_amount: number | null
+          per_day_amount: number | null
+          percentage_rate: number | null
+          currency: string
+          updated_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          policy?: ExtensionPenaltyPolicy | null
+          fixed_fee_amount?: number | null
+          per_day_amount?: number | null
+          percentage_rate?: number | null
+          currency?: string
+          updated_by?: string | null
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['extension_penalty_settings']['Insert']>
+        Relationships: []
+      }
+      vehicle_reassignments: {
+        Row: {
+          id: string
+          booking_id: string
+          triggering_extension_id: string | null
+          original_vehicle_id: string
+          replacement_vehicle_id: string
+          reason: string
+          created_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          triggering_extension_id?: string | null
+          original_vehicle_id: string
+          replacement_vehicle_id: string
+          reason: string
+          created_by: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['vehicle_reassignments']['Insert']>
+        Relationships: []
+      }
+      booking_notifications: {
+        Row: {
+          id: string
+          booking_id: string
+          notification_type: NotificationType
+          status: NotificationDeliveryStatus
+          payload: Record<string, unknown>
+          created_at: string
+          sent_at: string | null
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          notification_type: NotificationType
+          status?: NotificationDeliveryStatus
+          payload: Record<string, unknown>
+          created_at?: string
+          sent_at?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['booking_notifications']['Insert']>
+        Relationships: []
+      }
     }
     Views: {
       /**
@@ -374,6 +547,140 @@ export interface Database {
           customer_name: string
           payment_status: Database['public']['Tables']['payments']['Row']['status']
           created_at: string
+        }[]
+      }
+      /**
+       * Manage Booking single-field lookup — reference OR vehicle plate,
+       * either one alone is sufficient. See the migration's own header for
+       * the deliberate, owner-approved trade-off versus every other guest
+       * lookup in this project (which pairs two values together).
+       */
+      lookup_booking_for_customer: {
+        Args: { p_query: string }
+        Returns: {
+          booking_id: string
+          booking_reference: string
+          booking_status: Database['public']['Tables']['bookings']['Row']['status']
+          start_date: string
+          end_date: string
+          total_price: number
+          currency: string
+          vehicle_make: string
+          vehicle_model: string
+          vehicle_plate: string
+          pickup_location_name: string
+          dropoff_location_name: string
+          customer_name: string
+          payment_status: Database['public']['Tables']['payments']['Row']['status']
+          created_at: string
+        }[]
+      }
+      /**
+       * TEMPORARY testing-phase helper. SECURITY DEFINER — see
+       * supabase/migrations/20260830000000_admin_reset_test_data.sql.
+       * super_admin only (checked inside the function). Wipes all
+       * bookings/payments/complaints/vehicles/customers/audit_logs and
+       * returns the row counts that were deleted. Remove this entry along
+       * with the migration and its UI once testing is done.
+       */
+      admin_reset_all_test_data: {
+        Args: Record<string, never>
+        Returns: {
+          payments: number
+          complaints: number
+          bookings: number
+          drivers: number
+          vehicles: number
+          customers: number
+          audit_logs: number
+        }
+      }
+      /**
+       * Phase 7. Read-only preview only — see
+       * supabase/migrations/20260902000000_phase7_rental_extensions.sql.
+       * is_admin() checked inside. Checks the exact vehicle_id, never
+       * model/category. The real, race-safe guarantee is still the
+       * bookings_no_overlap exclusion constraint, re-applied inside
+       * request_booking_extension/confirm_booking_extension_payment.
+       */
+      check_vehicle_availability_for_extension: {
+        Args: { p_booking_id: string; p_requested_return_date: string }
+        Returns: boolean
+      }
+      /**
+       * Phase 7 (booking reassignment respec). SECURITY DEFINER,
+       * is_admin() checked inside. Two modes: p_existing_extension_id NULL
+       * inserts a new admin/WhatsApp-channel row and processes it
+       * immediately; supplied, it instead reviews an existing
+       * customer-submitted 'requested' row — the SAME engine either way.
+       * On a conflict with a future booking, attempts reassignment via
+       * resolve_extension_conflict() before falling back to
+       * conflict_unresolved. See
+       * supabase/migrations/20260903000000_phase7_booking_reassignment.sql.
+       */
+      request_booking_extension: {
+        Args: {
+          p_booking_id: string
+          p_requested_return_date: string
+          p_support_confirmed_by: string | null
+          p_support_confirmation_note: string | null
+          p_payment_method: 'cash' | 'online'
+          p_amount: number
+          p_currency: string
+          p_pricing_policy_used: ExtensionPricingPolicy
+          p_existing_extension_id?: string | null
+          p_penalty_amount?: number | null
+          p_penalty_policy_used?: ExtensionPenaltyPolicy | null
+          p_penalty_rate_used?: number | null
+        }
+        Returns: {
+          extension_id: string
+          status: ExtensionStatus
+          payment_status: PaymentStatus | null
+          rejection_reason: string | null
+          is_late: boolean
+          penalty_amount: number | null
+          conflict_booking_id: string | null
+          replacement_vehicle_id: string | null
+        }[]
+      }
+      /**
+       * Phase 7. Second step for an ONLINE extension only. Idempotent,
+       * same convention as Phase 2's confirm_payment. Now also runs
+       * resolve_extension_conflict() at the moment payment succeeds.
+       */
+      confirm_booking_extension_payment: {
+        Args: { p_extension_id: string; p_outcome: 'paid' | 'failed'; p_reference: string | null }
+        Returns: {
+          extension_id: string
+          status: ExtensionStatus
+          payment_status: PaymentStatus
+        }[]
+      }
+      /**
+       * Phase 7 (booking reassignment respec). Explicit admin rejection
+       * for a requested/conflict_unresolved/pending extension.
+       */
+      reject_extension_request: {
+        Args: { p_extension_id: string; p_rejection_reason: string }
+        Returns: { extension_id: string; status: ExtensionStatus }[]
+      }
+      /**
+       * Phase 7 (booking reassignment respec). Guest-safe verification for
+       * the self-service Extend Rental flow — zero rows on ANY mismatch
+       * between the booking reference and the vehicle number, same
+       * indistinguishable-failure shape as get_booking_by_reference.
+       */
+      verify_booking_for_extension: {
+        Args: { p_booking_reference: string; p_vehicle_number: string }
+        Returns: {
+          booking_id: string
+          booking_reference: string
+          vehicle_make: string
+          vehicle_model: string
+          vehicle_plate: string
+          current_return_date: string
+          booking_status: Database['public']['Tables']['bookings']['Row']['status']
         }[]
       }
     }

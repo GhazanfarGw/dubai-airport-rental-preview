@@ -5,8 +5,26 @@ import { BookingSearchSection } from '@/features/booking/BookingSearchSection'
 
 vi.mock('@/features/booking/api', () => ({
   fetchLocations: vi.fn().mockResolvedValue([
-    { id: 'loc-airport', name: 'DXB Terminal 3', type: 'airport', is_active: true, created_at: '' },
-    { id: 'loc-city', name: 'Downtown Dubai', type: 'city', is_active: true, created_at: '' },
+    {
+      id: 'loc-airport',
+      name: 'DXB Terminal 3',
+      type: 'airport',
+      city: 'Dubai',
+      country: 'United Arab Emirates',
+      airport_code: 'DXB',
+      is_active: true,
+      created_at: '',
+    },
+    {
+      id: 'loc-city',
+      name: 'Downtown Dubai',
+      type: 'city',
+      city: 'Dubai',
+      country: 'United Arab Emirates',
+      airport_code: null,
+      is_active: true,
+      created_at: '',
+    },
   ]),
 }))
 

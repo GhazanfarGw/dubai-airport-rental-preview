@@ -17,6 +17,8 @@ interface AdminAuthState {
   adminProfile: AdminProfile | null
   /** Set only when a real Auth session exists but has no admin_profiles row — lets the login page show a clear "not authorized" message instead of a silent redirect loop. */
   notAuthorized: boolean
+  /** Set when a real admin_profiles row exists but has been suspended (is_active = false) from the Staff Accounts screen — distinct from notAuthorized so the login page can show "your account was suspended" rather than "this account has no admin access". */
+  suspended: boolean
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -89,6 +91,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     session,
     adminProfile,
     notAuthorized: Boolean(session) && !loading && !adminProfile,
+    suspended: Boolean(adminProfile) && adminProfile?.is_active === false,
     signOut,
     refreshProfile,
   }

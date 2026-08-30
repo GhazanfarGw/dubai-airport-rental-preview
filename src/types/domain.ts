@@ -187,10 +187,13 @@ export type AdminAuditLogEntry = AuditLogRow
 // ---------------------------------------------------------------------------
 
 /**
- * Result of the guest-safe get_booking_by_reference() lookup — a small,
+ * Result of the guest-safe lookup_booking_for_customer() lookup — a small,
  * non-sensitive summary (no driver license/document fields, no phone),
  * deliberately the same shape of information already shown on
- * ConfirmationPage. See src/features/booking/lookupApi.ts.
+ * ConfirmationPage. See src/features/booking/lookupApi.ts. vehiclePlate is
+ * included (unlike the original Phase 6 shape) so the merged Manage
+ * Booking page can hand it straight to ExtendRentalSection without asking
+ * the customer to type it again.
  */
 export interface BookingLookupResult {
   bookingId: string
@@ -202,6 +205,7 @@ export interface BookingLookupResult {
   currency: string
   vehicleMake: string
   vehicleModel: string
+  vehiclePlate: string
   pickupLocationName: string
   dropoffLocationName: string
   customerName: string
@@ -238,4 +242,78 @@ export interface PricingDraft {
   term: PricingRow['term']
   listPrice: string
   clientPrice: string
+}
+
+// ---------------------------------------------------------------------------
+// Phase 7 — Rental Extension & Extension Payments
+// ---------------------------------------------------------------------------
+
+type BookingExtensionRow = Database['public']['Tables']['booking_extensions']['Row']
+type ExtensionPricingSettingsRow = Database['public']['Tables']['extension_pricing_settings']['Row']
+type ExtensionPenaltySettingsRow = Database['public']['Tables']['extension_penalty_settings']['Row']
+type VehicleReassignmentRow = Database['public']['Tables']['vehicle_reassignments']['Row']
+
+/**
+ * An extension record enriched with the joined rows the admin list/detail
+ * views need — same "admins manage X" RLS reach as every other admin
+ * screen, nothing privileged beyond what booking_extensions' own SELECT
+ * policy already allows. The original booking is included so the screen
+ * can show its (derived, never stored) reference — see
+ * src/lib/bookingReference.ts.
+ */
+export interface AdminExtensionWithDetails extends BookingExtensionRow {
+  bookings: (BookingRow & { vehicles: (VehicleRow & { vehicle_categories: CategoryRow | null }) | null; customers: CustomerRow | null }) | null
+  /** The replacement vehicle a conflicting future booking was moved to, if any — joined in for display, never guessed. */
+  replacement_vehicle?: VehicleRow | null
+}
+
+/**
+ * Phase 7 (direct Super Admin extension workflow) — a booking that is
+ * genuinely being rented right now, for the Extensions page's "Current
+ * Rented Cars" list. Deliberately lighter than AdminBookingWithDetails
+ * (no drivers/pickup/dropoff — that list never shows them): only the
+ * customer, exact vehicle, and payment rows this list and the Extend
+ * Rental panel actually need.
+ */
+export interface AdminCurrentRentedCar extends BookingRow {
+  customers: CustomerRow | null
+  vehicles: (VehicleRow & { vehicle_categories: CategoryRow | null; pricing: PricingRow[] }) | null
+  payments: PaymentRow[]
+}
+
+export type ExtensionPricingSettingsRecord = ExtensionPricingSettingsRow
+
+/**
+ * Phase 7 (booking reassignment respec) — mirrors ExtensionPricingSettingsRecord.
+ * See src/lib/extensionPenalty.ts.
+ */
+export type ExtensionPenaltySettingsRecord = ExtensionPenaltySettingsRow
+
+/** One traceability row for a booking whose vehicle was reassigned to resolve an extension conflict. */
+export type VehicleReassignmentRecord = VehicleReassignmentRow
+
+/** Draft shape for the "record a confirmed extension" admin form. */
+export interface ExtensionRequestDraft {
+  requestedReturnDate: string
+  supportConfirmedBy: string
+  supportConfirmationNote: string
+  paymentMethod: 'cash' | 'online'
+}
+
+export const EMPTY_EXTENSION_DRAFT: ExtensionRequestDraft = {
+  requestedReturnDate: '',
+  supportConfirmedBy: '',
+  supportConfirmationNote: '',
+  paymentMethod: 'cash',
+}
+
+/** Result shape for the guest-safe Extend Rental verification step (verify_booking_for_extension). */
+export interface ExtendRentalVerificationResult {
+  bookingId: string
+  bookingReference: string
+  vehicleMake: string
+  vehicleModel: string
+  vehiclePlate: string
+  currentReturnDate: string
+  bookingStatus: string
 }

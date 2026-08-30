@@ -1,8 +1,8 @@
 # Dubai Airport Car Rental — Platform
 
-Website-only booking platform for an airport-based, Dubai-only car rental
-service. WhatsApp is support-only, not a booking channel. Full context in
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Website-only booking platform for an airport-based car rental service
+covering Dubai and Abu Dhabi. WhatsApp is support-only, not a booking
+channel. Full context in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 **Status: Phase 0 — Project Foundation & Architecture.** No booking UI,
 admin dashboard, payment integration, or WhatsApp integration exists yet.

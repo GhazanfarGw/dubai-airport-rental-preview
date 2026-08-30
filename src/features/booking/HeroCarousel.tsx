@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { isRtl } from '@/i18n'
 import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
 import { prefersReducedMotion } from '@/lib/motion'
+import { Button } from '@/features/shared/ui/Button'
 
 const AUTOPLAY_INTERVAL_MS = 5000
 const SWIPE_THRESHOLD_PX = 50
@@ -154,13 +155,14 @@ export function HeroCarousel() {
             >
               <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-sm sm:text-5xl">{slide.title}</h1>
               <p className="mt-4 max-w-md text-base text-white/85 sm:text-lg">{slide.body}</p>
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={scrollToBooking}
-                className="mt-7 inline-flex items-center justify-center rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-brand-navy-dark shadow-lg shadow-black/20 transition-colors hover:bg-brand-gold-light"
+                className="mt-7 shadow-lg shadow-black/20"
               >
                 {t('hero.cta')}
-              </button>
+              </Button>
             </div>
           ))}
         </div>
@@ -173,11 +175,19 @@ export function HeroCarousel() {
               onClick={() => goTo(i)}
               aria-label={t('hero.carousel.goToSlide', { number: i + 1 })}
               aria-current={i === index}
-              className={
-                'h-1.5 rounded-full transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ' +
-                (i === index ? 'w-7 bg-brand-gold' : 'w-1.5 bg-white/40 hover:bg-white/60')
-              }
-            />
+              // The visual bar stays a slim 1.5px pill (unchanged look); the
+              // button itself gets a ~32px hit area via padding so it meets
+              // a comfortable touch-target size on mobile without resizing
+              // the pill or shifting dot spacing.
+              className="group flex items-center justify-center p-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <span
+                className={
+                  'block h-1.5 rounded-full transition-all ' +
+                  (i === index ? 'w-7 bg-brand-gold' : 'w-1.5 bg-white/40 group-hover:bg-white/60')
+                }
+              />
+            </button>
           ))}
         </div>
       </div>

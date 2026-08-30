@@ -1,5 +1,13 @@
 import type { ReactNode } from 'react'
+import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 
+/**
+ * Phase 8 — thin alias onto the shared `SectionHeader`
+ * (src/features/shared/ui/SectionHeader.tsx), which is byte-for-byte
+ * the same markup/classes this component used to render directly.
+ * Kept under this name so every existing admin page import keeps
+ * working with zero visual change.
+ */
 interface AdminPageHeaderProps {
   title: string
   description?: string
@@ -7,13 +15,5 @@ interface AdminPageHeaderProps {
 }
 
 export function AdminPageHeader({ title, description, action }: AdminPageHeaderProps) {
-  return (
-    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <h1 className="text-lg font-bold text-brand-navy sm:text-xl">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
-      </div>
-      {action && <div className="shrink-0">{action}</div>}
-    </div>
-  )
+  return <SectionHeader title={title} description={description} action={action} />
 }

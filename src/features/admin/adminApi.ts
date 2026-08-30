@@ -1,6 +1,14 @@
 import { supabase } from '@/lib/supabaseClient'
 
-export class AdminApiError extends Error {}
+export class AdminApiError extends Error {
+  /** Per-field validation messages, when the server returned them (currently only admin-create-staff does) — undefined for every other admin*Api.ts call site, which can safely ignore this. */
+  fieldErrors?: Record<string, string>
+
+  constructor(message: string, fieldErrors?: Record<string, string>) {
+    super(message)
+    this.fieldErrors = fieldErrors
+  }
+}
 
 /**
  * Every query in this file (and every other admin*Api.ts file) runs

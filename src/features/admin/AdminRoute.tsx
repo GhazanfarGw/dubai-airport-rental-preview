@@ -5,16 +5,19 @@ import { useAdminAuth } from '@/features/admin/AdminAuthContext'
 import { Spinner } from '@/features/shared/StateMessage'
 
 /**
- * Gate for every /admin/* page except the login page itself. Three states:
+ * Gate for every /admin/* page except the login page itself. Four states:
  *  - still checking the session/profile -> spinner, no flash of content
  *  - no session, or a session with no admin_profiles row -> bounce to login
- *  - a real admin -> render the page
+ *  - a suspended admin_profiles row (is_active = false, see the Staff
+ *    Accounts screen) -> bounce to login, which shows a distinct
+ *    "suspended" message rather than "not authorized"
+ *  - a real, active admin -> render the page
  * This is the ONLY place that decision is made, so no individual admin
  * page has to re-implement it.
  */
 export function AdminRoute({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
-  const { loading, session, adminProfile } = useAdminAuth()
+  const { loading, session, adminProfile, suspended } = useAdminAuth()
   const location = useLocation()
 
   if (loading) {
@@ -26,7 +29,7 @@ export function AdminRoute({ children }: { children: ReactNode }) {
     )
   }
 
-  if (!session || !adminProfile) {
+  if (!session || !adminProfile || suspended) {
     return <Navigate to="/admin/login" replace state={{ from: location.pathname }} />
   }
 

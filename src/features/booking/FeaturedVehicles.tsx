@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { fetchFeaturedVehicles } from '@/features/booking/api'
 import { VehicleCard } from '@/features/booking/VehicleCard'
+import { SectionHeader } from '@/features/shared/ui/SectionHeader'
+import { StateMessage } from '@/features/shared/StateMessage'
 import type { VehicleWithDetails } from '@/types/domain'
 
 /**
@@ -35,20 +37,21 @@ export function FeaturedVehicles() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-brand-navy sm:text-3xl">{t('home.featured.title')}</h2>
-          <p className="mt-2 max-w-xl text-sm text-slate-600">{t('home.featured.subtitle')}</p>
-        </div>
-        {vehicles && vehicles.length > 0 && (
-          <Link
-            to="/search"
-            className="shrink-0 text-sm font-semibold text-brand-navy underline-offset-4 hover:text-brand-navy-light hover:underline"
-          >
-            {t('home.featured.viewAll')}
-          </Link>
-        )}
-      </div>
+      <SectionHeader
+        as="h2"
+        title={t('home.featured.title')}
+        description={t('home.featured.subtitle')}
+        action={
+          vehicles && vehicles.length > 0 ? (
+            <Link
+              to="/search"
+              className="text-sm font-semibold text-brand-navy underline-offset-4 hover:text-brand-navy-light hover:underline"
+            >
+              {t('home.featured.viewAll')}
+            </Link>
+          ) : undefined
+        }
+      />
 
       <div className="mt-8">
         {loading && (
@@ -60,10 +63,7 @@ export function FeaturedVehicles() {
         )}
 
         {!loading && (error || !vehicles || vehicles.length === 0) && (
-          <div className="rounded-2xl border border-dashed border-brand-navy/15 bg-brand-lavender/20 px-6 py-14 text-center">
-            <p className="text-base font-semibold text-brand-navy">{t('home.featured.emptyTitle')}</p>
-            <p className="mt-2 text-sm text-slate-600">{t('home.featured.emptyBody')}</p>
-          </div>
+          <StateMessage title={t('home.featured.emptyTitle')} body={t('home.featured.emptyBody')} />
         )}
 
         {!loading && !error && vehicles && vehicles.length > 0 && (

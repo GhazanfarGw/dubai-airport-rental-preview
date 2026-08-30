@@ -10,6 +10,7 @@ import {
 import { AdminApiError } from '@/features/admin/adminApi'
 import { AdminPageHeader } from '@/features/admin/shared/AdminPageHeader'
 import { AdminStatusBadge } from '@/features/admin/shared/AdminStatusBadge'
+import { RentalExtensionsSection } from '@/features/admin/extensions/RentalExtensionsSection'
 import { StateMessage, Spinner } from '@/features/shared/StateMessage'
 import type { AdminBookingWithDetails, AdminBookingStatusHistoryEntry } from '@/types/domain'
 import type { Database } from '@/types/database'
@@ -193,6 +194,8 @@ export function BookingDetailPage() {
             </ul>
           )}
         </Section>
+
+        <RentalExtensionsSection bookingId={booking.id} bookingStatus={booking.status} onBookingChanged={() => void load()} />
       </div>
     </div>
   )

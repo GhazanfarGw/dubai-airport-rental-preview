@@ -1,46 +1,16 @@
-import { useTranslation } from 'react-i18next'
+import { StatusBadge } from '@/features/shared/ui/StatusBadge'
 
-const TONE_CLASSES: Record<string, string> = {
-  neutral: 'bg-slate-100 text-slate-700',
-  info: 'bg-brand-lavender text-brand-navy',
-  warning: 'bg-amber-100 text-amber-800',
-  success: 'bg-emerald-100 text-emerald-700',
-  danger: 'bg-red-100 text-red-700',
-}
-
-const STATUS_TONE: Record<string, keyof typeof TONE_CLASSES> = {
-  // bookings
-  pending_payment: 'warning',
-  confirmed: 'info',
-  active: 'success',
-  completed: 'neutral',
-  cancelled: 'danger',
-  // payments
-  pending: 'warning',
-  paid: 'success',
-  failed: 'danger',
-  refunded: 'neutral',
-  // complaints
-  open: 'danger',
-  in_progress: 'warning',
-  resolved: 'success',
-  closed: 'neutral',
-  // vehicles / operational
-  available: 'success',
-  reserved: 'info',
-  rented: 'warning',
-  maintenance: 'danger',
-  unavailable: 'neutral',
-  retired: 'neutral',
-}
-
-/** One consistent status-chip look across every admin list — booking/payment/complaint/vehicle status all key off the same translation namespace by their raw enum value. */
+/**
+ * Phase 8 — thin alias. The tone map and rendering this component used
+ * to own directly were extracted verbatim into the shared `StatusBadge`
+ * (src/features/shared/ui/StatusBadge.tsx) so the identical status-chip
+ * look can also serve the customer-facing side. `AdminStatusBadge` is
+ * kept, under the same name and the same single `status` prop, purely
+ * so every existing admin page that already imports it (Dashboard,
+ * Bookings, Fleet, Payments, Extensions, Complaints) keeps working with
+ * zero changes and zero behavior difference — same classes, same
+ * translation keys, same fallback.
+ */
 export function AdminStatusBadge({ status }: { status: string }) {
-  const { t } = useTranslation()
-  const tone = STATUS_TONE[status] ?? 'neutral'
-  return (
-    <span className={'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ' + TONE_CLASSES[tone]}>
-      {t(`admin.status.${status}`, { defaultValue: status })}
-    </span>
-  )
+  return <StatusBadge status={status} />
 }

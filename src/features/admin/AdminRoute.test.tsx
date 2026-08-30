@@ -52,9 +52,22 @@ describe('AdminRoute — the only place that decides admin access', () => {
     useAdminAuthMock.mockReturnValue({
       loading: false,
       session: { user: { id: 'u1' } },
-      adminProfile: { id: 'u1', full_name: 'Staff Member', role: 'staff' },
+      adminProfile: { id: 'u1', full_name: 'Staff Member', role: 'staff', is_active: true },
+      suspended: false,
     })
     renderGuarded()
     expect(screen.getByText('Secret dashboard content')).toBeInTheDocument()
+  })
+
+  it('blocks a suspended admin — see the Staff Accounts screen (is_active = false)', () => {
+    useAdminAuthMock.mockReturnValue({
+      loading: false,
+      session: { user: { id: 'u1' } },
+      adminProfile: { id: 'u1', full_name: 'Staff Member', role: 'staff', is_active: false },
+      suspended: true,
+    })
+    renderGuarded()
+    expect(screen.getByText('Admin login page')).toBeInTheDocument()
+    expect(screen.queryByText('Secret dashboard content')).not.toBeInTheDocument()
   })
 })

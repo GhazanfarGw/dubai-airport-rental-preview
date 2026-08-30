@@ -1,16 +1,33 @@
 import { supabase } from '@/lib/supabaseClient'
 import { AdminApiError } from '@/features/admin/adminApi'
-import type { AdminProfile } from '@/types/domain'
+
+// The staff directory (fetchStaffDirectory) and account-control actions
+// (create/suspend/promote) now live in
+// src/features/admin/staff/staffApi.ts, behind the dedicated Staff
+// Accounts screen — see supabase/migrations/20260901000000_staff_account_control.sql.
+
+export interface ResetTestDataCounts {
+  payments: number
+  complaints: number
+  bookings: number
+  drivers: number
+  vehicles: number
+  customers: number
+  audit_logs: number
+}
 
 /**
- * Read-only staff directory — "admins read all admin profiles" (Phase 0
- * RLS) already allows this for any signed-in admin; there is no
- * super_admin-only DB gate, so the UI is what restricts this list to
- * super_admin, per the spec ("no creation UI — provisioning stays a
- * manual SQL step", see docs/SETUP.md).
+ * TEMPORARY — testing-phase only. Calls admin_reset_all_test_data()
+ * (supabase/migrations/20260830000000_admin_reset_test_data.sql), which
+ * wipes every booking/payment/complaint/vehicle/customer/audit-log row.
+ * The function itself re-checks super_admin server-side, so this is safe
+ * to call even if the UI gate is ever bypassed — it will just error.
+ *
+ * Remove this function (and its "Danger Zone" caller in
+ * AdminSettingsPage.tsx) once testing is done and the team goes live.
  */
-export async function fetchAdminDirectory(): Promise<AdminProfile[]> {
-  const { data, error } = await supabase.from('admin_profiles').select('*').order('full_name')
+export async function resetAllTestData(): Promise<ResetTestDataCounts> {
+  const { data, error } = await supabase.rpc('admin_reset_all_test_data')
   if (error) throw new AdminApiError(error.message)
-  return data ?? []
+  return data as ResetTestDataCounts
 }

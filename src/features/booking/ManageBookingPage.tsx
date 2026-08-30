@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { lookupBookingByReference, BookingLookupError } from '@/features/booking/lookupApi'
+import { lookupBooking, BookingLookupError } from '@/features/booking/lookupApi'
+import { ExtendRentalSection } from '@/features/booking/ExtendRentalSection'
 import type { BookingLookupResult } from '@/types/domain'
 
 type ViewState =
@@ -11,27 +12,32 @@ type ViewState =
   | { status: 'error'; message: string }
   | { status: 'found'; result: BookingLookupResult }
 
+const EXTENDABLE_STATUSES = new Set(['confirmed', 'active'])
+
 /**
- * Phase 6 — Booking Retrieval. The guest-checkout equivalent of "manage my
- * booking": no account, no login — just the reference and email from the
- * confirmation. This is the only way to check a booking's status from a
- * different browser/device than the one used to book, or after the
- * same-browser confirmation snapshot (ConfirmationPage/sessionStorage) is
- * gone. See src/features/booking/lookupApi.ts and
- * supabase/migrations/20260829000000_phase6_booking_lookup.sql.
+ * Booking Status — merged "check my booking" + "extend my rental" page.
+ *
+ * Originally two separate screens (Phase 6's reference+email lookup, and
+ * the Phase 7 reassignment respec's reference+vehicle-number Extend
+ * Rental page). Merged per a direct follow-up request: one single field
+ * — the booking reference OR the vehicle's plate number, either alone —
+ * finds the booking, and if it's in a state that can still be extended,
+ * the extend-request form (ExtendRentalSection) appears right below the
+ * result instead of sending the customer to a second page. See
+ * lookupApi.ts and the lookup_booking_for_customer() migration for the
+ * deliberate single-field trade-off this relies on.
  */
 export function ManageBookingPage() {
   const { t } = useTranslation()
-  const [reference, setReference] = useState('')
-  const [email, setEmail] = useState('')
+  const [query, setQuery] = useState('')
   const [state, setState] = useState<ViewState>({ status: 'idle' })
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!reference.trim() || !email.trim()) return
+    if (!query.trim()) return
     setState({ status: 'loading' })
     try {
-      const result = await lookupBookingByReference(reference, email)
+      const result = await lookupBooking(query)
       setState(result ? { status: 'found', result } : { status: 'not_found' })
     } catch (err) {
       setState({
@@ -49,28 +55,15 @@ export function ManageBookingPage() {
       <form onSubmit={(e) => void handleSubmit(e)} noValidate className="mt-6 space-y-4 rounded-2xl border border-brand-navy/10 bg-white p-5">
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {t('manageBooking.referenceLabel')}
+            {t('manageBooking.queryLabel')}
           </span>
           <input
             type="text"
-            value={reference}
-            onChange={(e) => setReference(e.target.value)}
-            placeholder="BLS-XXXXXXXX"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="BLS-XXXXXXXX or ABC-123"
             className={inputClass}
             autoComplete="off"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {t('manageBooking.emailLabel')}
-          </span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className={inputClass}
-            autoComplete="email"
           />
         </label>
 
@@ -106,6 +99,7 @@ export function ManageBookingPage() {
 function ResultCard({ result }: { result: BookingLookupResult }) {
   const { t } = useTranslation()
   const isConfirmed = result.bookingStatus === 'confirmed'
+  const canExtend = EXTENDABLE_STATUSES.has(result.bookingStatus)
 
   return (
     <div className="mt-6 space-y-4 rounded-2xl border border-brand-navy/10 bg-white p-6">
@@ -121,12 +115,21 @@ function ResultCard({ result }: { result: BookingLookupResult }) {
         </span>
       </div>
       <Row label={t('checkout.confirmation.vehicle')} value={`${result.vehicleMake} ${result.vehicleModel}`} />
+      <Row label={t('extendRental.vehicleNumberLabel')} value={result.vehiclePlate} />
       <Row label={t('checkout.confirmation.rentalDates')} value={`${result.startDate} → ${result.endDate}`} />
       <Row label={t('checkout.confirmation.pickup')} value={result.pickupLocationName} />
       <Row label={t('checkout.confirmation.dropoff')} value={result.dropoffLocationName} />
       <Row label={t('checkout.confirmation.customer')} value={result.customerName} />
       <Row label={t('checkout.confirmation.amount')} value={`${result.currency} ${result.totalPrice.toLocaleString()}`} />
       <Row label={t('checkout.confirmation.paymentStatus')} value={result.paymentStatus} />
+
+      {canExtend && (
+        <ExtendRentalSection
+          bookingReference={result.bookingReference}
+          vehicleNumber={result.vehiclePlate}
+          currentReturnDate={result.endDate}
+        />
+      )}
     </div>
   )
 }

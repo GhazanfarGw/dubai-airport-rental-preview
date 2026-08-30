@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
+import { LinkButton } from '@/features/shared/ui/LinkButton'
 
 /**
- * Premium header. Desktop: logo, Home, Browse Fleet, About (in-page anchor
- * to the "Why Choose Bliss Rent" section), Services (in-page anchor to
- * "How It Works"), language switcher, and the primary "Search Cars" CTA.
- * No Contact/Support link — there is no real support channel to point it
- * at yet (the user chose in-page anchors only over inventing one).
+ * Premium header. Desktop: logo, Home, Browse Fleet, Car Types, About,
+ * Contact (all real pages — see src/features/content/), Services (still an
+ * in-page anchor to the homepage's "How It Works" section, since it isn't
+ * its own page), language switcher, and the primary "Search Cars" CTA.
  * Mobile: hamburger drawer with the same links plus the CTA.
  */
 export function NavBar() {
@@ -18,11 +18,11 @@ export function NavBar() {
   const links = [
     { to: '/', label: t('nav.home'), end: true },
     { to: '/search', label: t('nav.browseFleet'), end: false },
+    { to: '/car-types', label: t('nav.carTypes'), end: false },
+    { to: '/about', label: t('nav.about'), end: false },
+    { to: '/contact', label: t('nav.contact'), end: false },
   ]
-  const anchors = [
-    { to: { pathname: '/', hash: '#why-choose' }, label: t('nav.about') },
-    { to: { pathname: '/', hash: '#how-it-works' }, label: t('nav.services') },
-  ]
+  const anchors = [{ to: { pathname: '/', hash: '#how-it-works' }, label: t('nav.services') }]
 
   return (
     <header className="sticky top-0 z-40 border-b border-brand-navy/10 bg-white/95 backdrop-blur">
@@ -63,12 +63,9 @@ export function NavBar() {
 
         <div className="hidden items-center gap-4 lg:flex">
           <LanguageSwitcher />
-          <Link
-            to="/search"
-            className="rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light"
-          >
+          <LinkButton to="/search" variant="secondary" size="compact">
             {t('nav.searchCars')}
-          </Link>
+          </LinkButton>
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
@@ -117,13 +114,14 @@ export function NavBar() {
               {anchor.label}
             </Link>
           ))}
-          <Link
+          <LinkButton
             to="/search"
+            variant="secondary"
             onClick={() => setOpen(false)}
-            className="mt-2 block rounded-lg bg-brand-gold px-3 py-2.5 text-center text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light"
+            className="mt-2 w-full text-center"
           >
             {t('nav.searchCars')}
-          </Link>
+          </LinkButton>
         </nav>
       )}
     </header>

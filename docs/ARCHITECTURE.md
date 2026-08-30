@@ -10,14 +10,14 @@ and MUST be respected by every future phase:
 | **Website = Booking** | Customers book only through the website. There is no WhatsApp booking flow, and none of the schema, API, or UI should ever imply one. |
 | **WhatsApp = Complaints/Support** | WhatsApp is used only for complaints, support, rental issues, and general communication during/after a rental. The `complaints` table is where those conversations get logged in the system; no booking table references WhatsApp. |
 | **Customer = Provides Driver** | The company does not provide drivers. The `drivers` table captures driver details the *customer* supplies per booking. There is no company-driver assignment table anywhere in the schema. |
-| **Coverage = Dubai Only** | `locations` has no emirate/country field — multi-region support is explicitly out of scope until a later "Expand" phase. |
+| **Coverage = Dubai + Abu Dhabi** | `locations` has a `city` column (Dubai, Abu Dhabi) — see the "Multi-emirate locations" section below. Full UAE-wide coverage beyond these two emirates is still out of scope until a later "Expand" phase. |
 
 ## Customer journey (what the schema supports, not yet what's built)
 
 ```
 Website
   → Select Dates
-  → Select Location (Dubai only)
+  → Select City (Dubai or Abu Dhabi), then Location
   → Select Pickup
   → Select Drop-off
   → Select Vehicle
@@ -326,3 +326,32 @@ pass. The dev build was visually reviewed with Playwright/Chromium at
 Desktop (1440×900) and Mobile (390×844), in English and Arabic, cycling
 through all five slides in each configuration — see the Phase 4.1
 completion report.
+
+## Multi-emirate locations (Dubai + Abu Dhabi)
+
+`locations` gained a `city` TEXT column (migration
+`20260909000000_abu_dhabi_locations_multi_emirate.sql`) alongside the
+existing `location_type` enum (`'airport' | 'city'`). Every location row
+now carries both: `type` says whether it's an airport counter or a
+city drop-off point, and `city` says which emirate it's in (`'Dubai'` or
+`'Abu Dhabi'` today — the column is free-text so a future emirate is a
+data row, not a schema change).
+
+`fetchLocations()` (`src/features/booking/api.ts`) returns the full,
+unfiltered list ordered by `city`, then `type`, then `name`; callers that
+need a single city's points filter the result by `.city` themselves.
+`SearchWidget` does exactly this: a "Pickup City" selector (`pickupCity`
+state, Dubai listed first, other cities alphabetical) drives a derived
+`cityLocations` list that the pickup/drop-off `<select>` options map
+over, so switching city clears any location picked in the old one rather
+than leaving a stale, invisible selection. `LocationsPage` groups the
+same data by city first, then by type within each city, with headings
+built as `"{city} — {airport/city heading}"` — a dash-joined format
+chosen specifically so it reads correctly in both English and Arabic
+without a separate translated heading per city.
+
+Coverage is still explicitly bounded: the FAQ, footer, homepage copy,
+About page, and booking terms all say Dubai **and** Abu Dhabi, not
+UAE-wide — adding a third emirate later means a new `locations` city
+value, no other schema change, but the copy above should be revisited
+each time the coverage set grows.

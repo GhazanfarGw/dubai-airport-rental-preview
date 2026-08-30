@@ -6,7 +6,7 @@ vi.mock('@/lib/supabaseClient', () => ({
   supabase: { rpc: (...args: unknown[]) => rpcMock(...args) },
 }))
 
-const { lookupBookingByReference, BookingLookupError } = await import('./lookupApi')
+const { lookupBooking, BookingLookupError } = await import('./lookupApi')
 
 const row = {
   booking_id: 'bk-1',
@@ -18,6 +18,7 @@ const row = {
   currency: 'AED',
   vehicle_make: 'Toyota',
   vehicle_model: 'Camry',
+  vehicle_plate: 'ABC-123',
   pickup_location_name: 'DXB Terminal 3',
   dropoff_location_name: 'Downtown Dubai',
   customer_name: 'Jane Renter',
@@ -25,55 +26,58 @@ const row = {
   created_at: '2026-08-20T10:00:00Z',
 }
 
-describe('lookupBookingByReference', () => {
+const expectedResult = {
+  bookingId: 'bk-1',
+  bookingReference: 'BLS-ABCDEF12',
+  bookingStatus: 'confirmed',
+  startDate: '2026-09-10',
+  endDate: '2026-09-15',
+  totalPrice: 900,
+  currency: 'AED',
+  vehicleMake: 'Toyota',
+  vehicleModel: 'Camry',
+  vehiclePlate: 'ABC-123',
+  pickupLocationName: 'DXB Terminal 3',
+  dropoffLocationName: 'Downtown Dubai',
+  customerName: 'Jane Renter',
+  paymentStatus: 'paid',
+  createdAt: '2026-08-20T10:00:00Z',
+}
+
+describe('lookupBooking', () => {
   beforeEach(() => {
     rpcMock.mockReset()
   })
 
-  it('calls get_booking_by_reference with the trimmed reference and email', async () => {
+  it('calls lookup_booking_for_customer with the trimmed query', async () => {
     rpcMock.mockResolvedValue({ data: [row], error: null })
-    await lookupBookingByReference('  BLS-ABCDEF12  ', '  Jane@Example.com  ')
-    expect(rpcMock).toHaveBeenCalledWith('get_booking_by_reference', {
-      p_booking_reference: 'BLS-ABCDEF12',
-      p_email: 'Jane@Example.com',
+    await lookupBooking('  BLS-ABCDEF12  ')
+    expect(rpcMock).toHaveBeenCalledWith('lookup_booking_for_customer', {
+      p_query: 'BLS-ABCDEF12',
     })
   })
 
-  it('maps a matching row into a BookingLookupResult', async () => {
+  it('maps a match found by booking reference into a BookingLookupResult', async () => {
     rpcMock.mockResolvedValue({ data: [row], error: null })
-    const result = await lookupBookingByReference('BLS-ABCDEF12', 'jane@example.com')
-    expect(result).toEqual({
-      bookingId: 'bk-1',
-      bookingReference: 'BLS-ABCDEF12',
-      bookingStatus: 'confirmed',
-      startDate: '2026-09-10',
-      endDate: '2026-09-15',
-      totalPrice: 900,
-      currency: 'AED',
-      vehicleMake: 'Toyota',
-      vehicleModel: 'Camry',
-      pickupLocationName: 'DXB Terminal 3',
-      dropoffLocationName: 'Downtown Dubai',
-      customerName: 'Jane Renter',
-      paymentStatus: 'paid',
-      createdAt: '2026-08-20T10:00:00Z',
-    })
+    const result = await lookupBooking('BLS-ABCDEF12')
+    expect(result).toEqual(expectedResult)
   })
 
-  it('returns null (not an error) when the reference/email combination matches nothing', async () => {
-    rpcMock.mockResolvedValue({ data: [], error: null })
-    const result = await lookupBookingByReference('BLS-NOTREAL1', 'nobody@example.com')
-    expect(result).toBeNull()
+  it('maps a match found by vehicle plate alone (no reference typed) the same way', async () => {
+    rpcMock.mockResolvedValue({ data: [row], error: null })
+    const result = await lookupBooking('ABC-123')
+    expect(rpcMock).toHaveBeenCalledWith('lookup_booking_for_customer', { p_query: 'ABC-123' })
+    expect(result).toEqual(expectedResult)
   })
 
-  it('returns null identically for a wrong email on a real reference — never distinguishes the two', async () => {
+  it('returns null (not an error) when the query matches nothing', async () => {
     rpcMock.mockResolvedValue({ data: [], error: null })
-    const result = await lookupBookingByReference('BLS-ABCDEF12', 'wrong@example.com')
+    const result = await lookupBooking('BLS-NOTREAL1')
     expect(result).toBeNull()
   })
 
   it('raises BookingLookupError on a database error', async () => {
     rpcMock.mockResolvedValue({ data: null, error: { message: 'connection failed' } })
-    await expect(lookupBookingByReference('BLS-ABCDEF12', 'jane@example.com')).rejects.toThrow(BookingLookupError)
+    await expect(lookupBooking('BLS-ABCDEF12')).rejects.toThrow(BookingLookupError)
   })
 })

@@ -23,7 +23,7 @@ export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
         'rounded-lg border border-brand-navy/20 px-3 py-1.5 text-sm font-semibold text-brand-navy transition-colors hover:bg-brand-lavender ' +
         className
       }
-      aria-label="Switch language"
+      aria-label={t('nav.switchLanguage')}
     >
       {t('nav.language')}
     </button>

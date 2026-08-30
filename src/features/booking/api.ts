@@ -6,12 +6,21 @@ const VEHICLE_SELECT =
 
 export class BookingApiError extends Error {}
 
-/** Dubai-only by construction — `locations` has no region/country column at all (see docs/ARCHITECTURE.md). */
+/**
+ * Bliss Rent is a UAE-wide business by design — `locations` has a `city`
+ * column (free-text, not an enum: today it's Dubai and Abu Dhabi, but
+ * adding Sharjah, Ajman, or any other city is a data row, never a schema
+ * or code change) — see docs/ARCHITECTURE.md. Callers that need a single
+ * city's pickup/drop-off points should filter the result by `.city`, same
+ * as SearchWidget's Pickup City selector does. No component should
+ * hardcode the current city list — it always comes from this query.
+ */
 export async function fetchLocations(): Promise<Location[]> {
   const { data, error } = await supabase
     .from('locations')
     .select('*')
     .eq('is_active', true)
+    .order('city')
     .order('type')
     .order('name')
 

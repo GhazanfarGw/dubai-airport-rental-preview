@@ -4,28 +4,24 @@ import type { BookingLookupResult } from '@/types/domain'
 export class BookingLookupError extends Error {}
 
 /**
- * Phase 6 — Booking Retrieval. Guest checkout has no auth session (see
- * ConfirmationPage.tsx / docs/ARCHITECTURE.md), so this is the only way a
- * customer can check their booking status later, from a different
+ * Manage Booking — single-field lookup. Guest checkout has no auth session
+ * (see ConfirmationPage.tsx / docs/ARCHITECTURE.md), so this is the only
+ * way a customer can check their booking status later, from a different
  * browser or device, or after their same-browser sessionStorage
- * confirmation snapshot is gone. Calls the SECURITY DEFINER
- * get_booking_by_reference() RPC (Phase 6 migration) — same pattern as
- * available_vehicles() (Phase 1): a narrow, purpose-built database
- * function is the only thing that can see the private bookings table,
- * and it hands back nothing beyond what ConfirmationPage already shows.
+ * confirmation snapshot is gone.
  *
- * Returns null for ANY mismatch (unknown reference, wrong email, or a
- * reference that belongs to someone else) — never a distinct "wrong
- * email" vs "wrong reference" error, so this can't be used to test
- * whether a given reference exists.
+ * Follow-up request (made directly in chat, after Phase 7 shipped):
+ * replace the original reference+email pairing with ONE field that
+ * accepts EITHER the booking reference OR the vehicle's plate number.
+ * This is a deliberate, owner-approved reduction from this project's usual
+ * "two values must match together" pattern — see the
+ * lookup_booking_for_customer() migration's own header for the full
+ * trade-off explanation. Calls that SECURITY DEFINER RPC, which returns
+ * zero rows when the query matches neither a reference nor a plate.
  */
-export async function lookupBookingByReference(
-  bookingReference: string,
-  email: string,
-): Promise<BookingLookupResult | null> {
-  const { data, error } = await supabase.rpc('get_booking_by_reference', {
-    p_booking_reference: bookingReference.trim(),
-    p_email: email.trim(),
+export async function lookupBooking(query: string): Promise<BookingLookupResult | null> {
+  const { data, error } = await supabase.rpc('lookup_booking_for_customer', {
+    p_query: query.trim(),
   })
 
   if (error) throw new BookingLookupError(error.message)
@@ -42,6 +38,7 @@ export async function lookupBookingByReference(
     currency: row.currency,
     vehicleMake: row.vehicle_make,
     vehicleModel: row.vehicle_model,
+    vehiclePlate: row.vehicle_plate,
     pickupLocationName: row.pickup_location_name,
     dropoffLocationName: row.dropoff_location_name,
     customerName: row.customer_name,
