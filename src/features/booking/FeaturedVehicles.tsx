@@ -56,7 +56,7 @@ export function FeaturedVehicles() {
       <div className="mt-8">
         {loading && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
-            {[0, 1, 2].map((i) => (
+            {[0, 1, 2, 3].map((i) => (
               <div key={i} className="h-72 animate-pulse rounded-2xl bg-brand-lavender/40" />
             ))}
           </div>
@@ -67,7 +67,7 @@ export function FeaturedVehicles() {
         )}
 
         {!loading && !error && vehicles && vehicles.length > 0 && (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {vehicles.map((vehicle) => (
               <VehicleCard key={vehicle.id} vehicle={vehicle} detailHref={`/vehicles/${vehicle.id}`} />
             ))}

@@ -9,11 +9,13 @@ import {
   BookingApiError,
 } from '@/features/booking/api'
 import { VehicleGallery } from '@/features/booking/VehicleGallery'
+import { CitySelect, LocationPickerButton } from '@/features/booking/LocationField'
+import { DateRangePicker } from '@/features/booking/DateRangePicker'
 import { StateMessage, Spinner } from '@/features/shared/StateMessage'
 import { quoteForDays, cheapestHeadlineRate, TERM_LABELS } from '@/lib/pricing'
 import { rentalDays, validateDateRange } from '@/lib/dateRange'
 import { isCompleteCriteria, searchParamsToCriteria } from '@/features/booking/searchParams'
-import type { Location, VehicleWithDetails } from '@/types/domain'
+import type { Location, SearchCriteria, VehicleWithDetails } from '@/types/domain'
 
 type LoadState =
   | { status: 'loading' }
@@ -35,6 +37,9 @@ export function VehicleDetailPage() {
   const [availability, setAvailability] = useState<'checking' | 'available' | 'unavailable' | 'unknown'>(
     hasDates ? 'checking' : 'unknown',
   )
+  const [quickEditor, setQuickEditor] = useState<'dates' | 'pickup' | 'dropoff' | null>(null)
+  const [quickCriteria, setQuickCriteria] = useState<Partial<SearchCriteria>>(criteria)
+  const [quickPickupCity, setQuickPickupCity] = useState('Dubai')
 
   useEffect(() => {
     if (!id) return
@@ -119,18 +124,37 @@ export function VehicleDetailPage() {
   const headline = cheapestHeadlineRate(vehicle.pricing)
   const pickup = locations.find((l) => l.id === criteria.pickupLocationId)
   const dropoff = locations.find((l) => l.id === criteria.dropoffLocationId)
+  const displayPickup = locations.find((l) => l.id === quickCriteria.pickupLocationId) ?? pickup
+  const displayDropoff = locations.find((l) => l.id === quickCriteria.dropoffLocationId) ?? dropoff
+  const displayHasDates = Boolean(
+    quickCriteria.startDate && quickCriteria.endDate && validateDateRange(quickCriteria.startDate, quickCriteria.endDate).valid,
+  )
+
+  function handleSearch(next: Parameters<typeof criteriaToSearchParams>[0]) {
+    navigate(`/vehicles/${id}?${criteriaToSearchParams(next).toString()}`)
+  }
+
+  function updateQuickCriteria(next: Partial<SearchCriteria>) {
+    setQuickCriteria(next)
+    if (isCompleteCriteria(next) && validateDateRange(next.startDate, next.endDate).valid) {
+      handleSearch(next)
+      setQuickEditor(null)
+    }
+  }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <Link to="/search" className="text-sm font-medium text-slate-500 hover:text-brand-navy">
         ← {t('vehicleDetail.backToResults')}
       </Link>
 
-      <div className="mt-4 grid grid-cols-1 gap-10 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
+        <div className="min-w-0">
           <VehicleGallery images={vehicle.vehicle_images} alt={`${vehicle.make} ${vehicle.model}`} />
+        </div>
 
-          <div className="mt-8">
+        <section className="rounded-2xl border border-brand-navy/10 bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-24">
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl font-bold text-brand-navy">
                 {vehicle.make} {vehicle.model}
@@ -150,10 +174,8 @@ export function VehicleDetailPage() {
               {vehicle.vehicle_categories && <Spec label={t('vehicleDetail.category')} value={vehicle.vehicle_categories.name} />}
             </dl>
           </div>
-        </div>
 
-        <aside className="lg:col-span-1">
-          <div className="sticky top-24 rounded-2xl border border-brand-navy/10 bg-white p-5 shadow-sm">
+          <div className="mt-6 border-t border-brand-navy/10 pt-5">
             {quote ? (
               <>
                 <p className="text-2xl font-bold text-brand-navy">
@@ -178,19 +200,60 @@ export function VehicleDetailPage() {
             )}
 
             <div className="mt-4 space-y-2 border-t border-brand-navy/10 pt-4 text-sm">
-              <Row label={t('vehicleDetail.dates')} value={hasDates ? `${criteria.startDate} → ${criteria.endDate}` : t('vehicleDetail.notSelected')} />
-              <Row label={t('vehicleDetail.pickup')} value={pickup?.name ?? t('vehicleDetail.notSelected')} />
-              <Row label={t('vehicleDetail.dropoff')} value={dropoff?.name ?? t('vehicleDetail.notSelected')} />
+              <EditableRow label={t('vehicleDetail.dates')} value={displayHasDates ? `${quickCriteria.startDate} → ${quickCriteria.endDate}` : t('vehicleDetail.notSelected')} onClick={() => setQuickEditor('dates')} />
+              <EditableRow label={t('vehicleDetail.pickup')} value={displayPickup?.name ?? t('vehicleDetail.notSelected')} onClick={() => { setQuickPickupCity(displayPickup?.city ?? 'Dubai'); setQuickEditor('pickup') }} />
+              <EditableRow label={t('vehicleDetail.dropoff')} value={displayDropoff?.name ?? t('vehicleDetail.notSelected')} onClick={() => setQuickEditor('dropoff')} />
               <Row label={t('vehicleDetail.availability')} value={<AvailabilityBadge state={availability} />} />
             </div>
 
-            {!hasDates && (
-              <p className="mt-4 text-xs text-slate-500">
-                <Link to="/search" className="font-semibold text-brand-navy underline">
-                  {t('vehicleDetail.chooseDatesPrompt')}
-                </Link>{' '}
-                {t('vehicleDetail.chooseDatesSuffix')}
-              </p>
+            {quickEditor && (
+              <div className="mt-4 border-t border-brand-navy/10 pt-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold text-brand-navy">{t('vehicleDetail.chooseTripDetails')}</p>
+                  <button type="button" onClick={() => setQuickEditor(null)} className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-brand-navy hover:underline">{t('common.close')}</button>
+                </div>
+                <div className="mt-3">
+                  {quickEditor === 'dates' && (
+                    <DateRangePicker
+                      startDate={quickCriteria.startDate ?? ''}
+                      endDate={quickCriteria.endDate ?? ''}
+                      onChange={(next) => updateQuickCriteria({ ...quickCriteria, ...next })}
+                      todayIso={new Date().toISOString().slice(0, 10)}
+                    />
+                  )}
+                  {quickEditor === 'pickup' && (
+                    <div className="space-y-3">
+                      <CitySelect
+                        label={t('searchWidget.pickupCity')}
+                        ariaLabel={t('searchWidget.pickupCity')}
+                        value={quickPickupCity}
+                        onChange={(city) => { setQuickPickupCity(city); setQuickCriteria({ ...quickCriteria, pickupLocationId: '', dropoffLocationId: quickCriteria.dropoffLocationId === quickCriteria.pickupLocationId ? '' : quickCriteria.dropoffLocationId }) }}
+                        cities={Array.from(new Set(locations.map((location) => location.city))).sort()}
+                      />
+                      <LocationPickerButton
+                        label={t('searchWidget.pickupLocation')}
+                        locationId={quickCriteria.pickupLocationId ?? ''}
+                        onLocationChange={(locationId) => updateQuickCriteria({ ...quickCriteria, pickupLocationId: locationId, dropoffLocationId: quickCriteria.dropoffLocationId || locationId })}
+                        options={locations.filter((location) => location.country === 'United Arab Emirates' && location.city === quickPickupCity)}
+                        loading={locations.length === 0}
+                        placeholder={t('searchWidget.selectPickup')}
+                        sheetTitle={t('searchWidget.choosePickupLocation')}
+                      />
+                    </div>
+                  )}
+                  {quickEditor === 'dropoff' && (
+                    <LocationPickerButton
+                      label={t('searchWidget.returnLocation')}
+                      locationId={quickCriteria.dropoffLocationId ?? ''}
+                      onLocationChange={(locationId) => updateQuickCriteria({ ...quickCriteria, dropoffLocationId: locationId })}
+                      options={locations.filter((location) => location.country === 'United Arab Emirates')}
+                      loading={locations.length === 0}
+                      placeholder={t('searchWidget.selectReturnLocation')}
+                      sheetTitle={t('searchWidget.chooseReturnLocation')}
+                    />
+                  )}
+                </div>
+              </div>
             )}
 
             <button
@@ -208,8 +271,9 @@ export function VehicleDetailPage() {
               {t('vehicleDetail.paymentNote')}
             </p>
           </div>
-        </aside>
+        </section>
       </div>
+
     </div>
   )
 }
@@ -228,6 +292,17 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
     <div className="flex items-center justify-between">
       <span className="text-slate-500">{label}</span>
       <span className="font-medium text-brand-navy">{value}</span>
+    </div>
+  )
+}
+
+function EditableRow({ label, value, onClick }: { label: string; value: ReactNode; onClick: () => void }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-slate-500">{label}</span>
+      <button type="button" onClick={onClick} className="max-w-[65%] truncate text-end font-medium text-brand-navy underline decoration-brand-gold/60 underline-offset-4 hover:text-brand-navy-light focus:outline-none focus:ring-2 focus:ring-brand-gold">
+        {value}
+      </button>
     </div>
   )
 }

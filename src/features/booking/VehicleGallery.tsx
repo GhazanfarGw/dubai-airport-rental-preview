@@ -14,7 +14,7 @@ export function VehicleGallery({ images, alt }: { images: ImageRow[]; alt: strin
       <VehiclePhoto
         storagePath={active?.storage_path ?? null}
         alt={alt}
-        className="h-64 w-full rounded-2xl sm:h-96"
+        className="h-72 w-full rounded-2xl sm:h-[28rem] lg:h-[34rem]"
       />
       {sorted.length > 1 && (
         <div className="mt-3 flex gap-2 overflow-x-auto">

@@ -14,6 +14,7 @@ interface DialogProps {
   closeLabel: string
   children: ReactNode
   maxWidthClassName?: string
+  mobileSheet?: boolean
 }
 
 /**
@@ -24,7 +25,7 @@ interface DialogProps {
  * neither of which had any of the above. RTL-safe: uses only logical
  * spacing, no directional classes.
  */
-export function Dialog({ open, onClose, title, closeLabel, children, maxWidthClassName = 'max-w-lg' }: DialogProps) {
+export function Dialog({ open, onClose, title, closeLabel, children, maxWidthClassName = 'max-w-lg', mobileSheet = false }: DialogProps) {
   const titleId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
@@ -67,7 +68,7 @@ export function Dialog({ open, onClose, title, closeLabel, children, maxWidthCla
   if (!open) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className={'fixed inset-0 z-50 flex justify-center p-4 ' + (mobileSheet ? 'items-end sm:items-center' : 'items-center')}>
       <div className="absolute inset-0 bg-brand-navy-dark/50" onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
@@ -75,7 +76,7 @@ export function Dialog({ open, onClose, title, closeLabel, children, maxWidthCla
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`relative z-10 max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-surface p-6 shadow-md outline-none ${maxWidthClassName}`}
+        className={`relative z-10 max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-surface p-6 shadow-md outline-none ${mobileSheet ? 'rounded-b-none sm:rounded-2xl' : ''} ${maxWidthClassName}`}
       >
         <div className="mb-4 flex items-start justify-between gap-3">
           <h2 id={titleId} className="text-base font-semibold text-brand-navy">
@@ -85,7 +86,7 @@ export function Dialog({ open, onClose, title, closeLabel, children, maxWidthCla
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-brand-navy"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-gold"
           >
             <CloseIcon />
           </button>

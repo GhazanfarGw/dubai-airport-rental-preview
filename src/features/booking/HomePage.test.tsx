@@ -6,6 +6,7 @@ import { HomePage } from '@/features/booking/HomePage'
 vi.mock('@/features/booking/api', () => ({
   fetchLocations: vi.fn().mockResolvedValue([]),
   fetchFeaturedVehicles: vi.fn().mockResolvedValue([]),
+  fetchAllAvailableVehicles: vi.fn().mockResolvedValue([]),
 }))
 
 describe('HomePage', () => {
@@ -26,7 +27,7 @@ describe('HomePage', () => {
     const featured = screen.getByRole('heading', { name: 'Featured vehicles' })
     const howItWorks = await screen.findByRole('heading', { name: 'How it works' })
 
-    const order = [hero, booking, whyChoose, featured, howItWorks]
+    const order = [hero, booking, featured, whyChoose, howItWorks]
     for (let i = 0; i < order.length - 1; i++) {
       // eslint-disable-next-line no-bitwise
       expect(order[i].compareDocumentPosition(order[i + 1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()

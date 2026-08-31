@@ -32,7 +32,7 @@ export function buttonClass({
   fullWidthOnMobile?: boolean
 } = {}): string {
   return [
-    'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors',
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg font-semibold transition-colors',
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold',
     'disabled:cursor-not-allowed disabled:opacity-50',
     VARIANT_CLASSES[variant],

@@ -1,8 +1,9 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import i18n from '@/i18n'
 import { NavBar } from '@/features/shared/NavBar'
+import { RouteNavigationShell } from '@/features/shared/RouteNavigationShell'
 
 function renderNavBar() {
   return render(
@@ -59,6 +60,19 @@ describe('NavBar', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 
+  it('hides while scrolling down and returns while scrolling up', () => {
+    renderNavBar()
+    const header = screen.getByRole('banner')
+
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
+    fireEvent.scroll(window)
+    expect(header.className).toContain('-translate-y-full')
+
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 120 })
+    fireEvent.scroll(window)
+    expect(header.className).toContain('translate-y-0')
+  })
+
   it('switches the interface language, which also flips the document to RTL', async () => {
     renderNavBar()
     const switchButtons = screen.getAllByRole('button', { name: /switch language/i })
@@ -69,5 +83,41 @@ describe('NavBar', () => {
 
     expect(document.documentElement.dir).toBe('rtl')
     expect(screen.getAllByRole('link', { name: 'الرئيسية' }).length).toBeGreaterThan(0)
+  })
+
+  it('shows a route loader only after a real route change and scrolls to top', async () => {
+    const scrollSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+
+    function TestHarness() {
+      const navigate = useNavigate()
+      return (
+        <>
+          <button onClick={() => navigate('/search')}>Go to search</button>
+          <Routes>
+            <Route path="/" element={<div>Home</div>} />
+            <Route path="/search" element={<div>Search</div>} />
+          </Routes>
+        </>
+      )
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <RouteNavigationShell>
+          <TestHarness />
+        </RouteNavigationShell>
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Go to search' }))
+    })
+
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(scrollSpy).toHaveBeenCalledWith({ top: 0, left: 0, behavior: 'auto' })
+
+    scrollSpy.mockRestore()
   })
 })

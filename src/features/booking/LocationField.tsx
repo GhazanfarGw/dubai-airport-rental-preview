@@ -39,7 +39,7 @@ interface CitySelectProps {
 
 export function CitySelect({ label, ariaLabel, value, onChange, cities, disabled = false, row = false }: CitySelectProps) {
   return (
-    <div className={row ? 'flex w-32 shrink-0 flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-36'}>
+    <div className={row ? 'flex w-32 shrink-0 flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-64'}>
       <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
       <select
         value={value}
@@ -92,12 +92,13 @@ export function LocationPickerButton({
   const selected = sorted.find((l) => l.id === locationId) ?? null
 
   return (
-    <div className={row ? 'flex min-w-0 flex-1 flex-col gap-1 sm:w-56 sm:flex-none' : 'flex w-full flex-col gap-1 sm:w-64'}>
+    <div className={row ? 'flex min-w-0 flex-1 flex-col gap-1 sm:min-w-[190px]' : 'flex w-full flex-col gap-1 sm:w-64'}>
       <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
       <button
         type="button"
         onClick={() => setSheetOpen(true)}
         disabled={disabled}
+        aria-expanded={sheetOpen}
         className="flex w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
       >
         <span className="min-w-0 truncate font-medium">
@@ -106,7 +107,7 @@ export function LocationPickerButton({
         <ChevronIcon className="h-4 w-4 shrink-0 text-slate-400 rtl:rotate-180" />
       </button>
 
-      <Dialog open={sheetOpen} onClose={() => setSheetOpen(false)} title={sheetTitle} closeLabel={t('common.close')}>
+      <Dialog open={sheetOpen} onClose={() => setSheetOpen(false)} title={sheetTitle} closeLabel={t('common.close')} mobileSheet maxWidthClassName="max-w-xl">
         <LocationOptionList
           options={sorted.map(locationToOption)}
           selectedId={locationId}
@@ -176,7 +177,7 @@ function LocationOptionList({
               type="button"
               onClick={() => onSelect(opt.id)}
               className={
-                'flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors ' +
+                'flex min-h-14 w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-gold ' +
                 (opt.id === selectedId
                   ? 'bg-brand-lavender/60 text-brand-navy'
                   : 'text-slate-700 hover:bg-slate-50')

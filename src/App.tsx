@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from '@/features/shared/Layout'
+import { RouteNavigationShell } from '@/features/shared/RouteNavigationShell'
 import { HomePage } from '@/features/booking/HomePage'
 import { SearchResultsPage } from '@/features/booking/SearchResultsPage'
 import { VehicleDetailPage } from '@/features/booking/VehicleDetailPage'
@@ -91,71 +92,73 @@ function App() {
   return (
     <BrowserRouter>
       <AdminAuthProvider>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/search" element={<SearchResultsPage />} />
-            <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
-            <Route path="/checkout/:id/customer" element={<CustomerDetailsPage />} />
-            <Route path="/checkout/:id/driver" element={<DriverDetailsPage />} />
-            <Route path="/checkout/:id/summary" element={<BookingSummaryPage />} />
-            <Route path="/checkout/:id/payment/:bookingId" element={<PaymentPage />} />
-            <Route path="/checkout/:id/confirmation/:bookingId" element={<ConfirmationPage />} />
-            <Route path="/manage-booking" element={<ManageBookingPage />} />
-            <Route path="/extend-rental" element={<Navigate to="/manage-booking" replace />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/car-types" element={<CarTypesPage />} />
-            <Route path="/locations" element={<LocationsPage />} />
-            <Route path="/faqs" element={<FaqPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-            <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-            <Route path="/booking-terms" element={<BookingTermsPage />} />
-          </Route>
+        <RouteNavigationShell>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/search" element={<SearchResultsPage />} />
+              <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
+              <Route path="/checkout/:id/customer" element={<CustomerDetailsPage />} />
+              <Route path="/checkout/:id/driver" element={<DriverDetailsPage />} />
+              <Route path="/checkout/:id/summary" element={<BookingSummaryPage />} />
+              <Route path="/checkout/:id/payment/:bookingId" element={<PaymentPage />} />
+              <Route path="/checkout/:id/confirmation/:bookingId" element={<ConfirmationPage />} />
+              <Route path="/manage-booking" element={<ManageBookingPage />} />
+              <Route path="/extend-rental" element={<Navigate to="/manage-booking" replace />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/car-types" element={<CarTypesPage />} />
+              <Route path="/locations" element={<LocationsPage />} />
+              <Route path="/faqs" element={<FaqPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+              <Route path="/booking-terms" element={<BookingTermsPage />} />
+            </Route>
 
-          <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
 
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            }
-          >
-            <Route index element={<DashboardPage />} />
-            <Route path="bookings" element={<BookingsListPage />} />
-            <Route path="bookings/:id" element={<BookingDetailPage />} />
-            <Route path="fleet" element={<FleetListPage />} />
-            <Route path="fleet/new" element={<VehicleFormPage />} />
-            <Route path="fleet/:id" element={<VehicleFormPage />} />
-            <Route path="availability" element={<AvailabilityCalendarPage />} />
-            <Route path="customers" element={<CustomersListPage />} />
-            <Route path="customers/:id" element={<CustomerDetailPage />} />
-            <Route path="payments" element={<PaymentsListPage />} />
-            <Route path="extensions" element={<ExtensionsListPage />} />
-            <Route path="complaints" element={<ComplaintsListPage />} />
-            <Route path="complaints/:id" element={<ComplaintDetailPage />} />
-            <Route path="pricing" element={<PricingManagementPage />} />
             <Route
-              path="audit-log"
+              path="/admin"
               element={
-                <SuperAdminRoute>
-                  <AuditLogPage />
-                </SuperAdminRoute>
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
               }
-            />
-            <Route
-              path="staff"
-              element={
-                <SuperAdminRoute>
-                  <StaffAccountsPage />
-                </SuperAdminRoute>
-              }
-            />
-            <Route path="settings" element={<AdminSettingsPage />} />
-          </Route>
-        </Routes>
+            >
+              <Route index element={<DashboardPage />} />
+              <Route path="bookings" element={<BookingsListPage />} />
+              <Route path="bookings/:id" element={<BookingDetailPage />} />
+              <Route path="fleet" element={<FleetListPage />} />
+              <Route path="fleet/new" element={<VehicleFormPage />} />
+              <Route path="fleet/:id" element={<VehicleFormPage />} />
+              <Route path="availability" element={<AvailabilityCalendarPage />} />
+              <Route path="customers" element={<CustomersListPage />} />
+              <Route path="customers/:id" element={<CustomerDetailPage />} />
+              <Route path="payments" element={<PaymentsListPage />} />
+              <Route path="extensions" element={<ExtensionsListPage />} />
+              <Route path="complaints" element={<ComplaintsListPage />} />
+              <Route path="complaints/:id" element={<ComplaintDetailPage />} />
+              <Route path="pricing" element={<PricingManagementPage />} />
+              <Route
+                path="audit-log"
+                element={
+                  <SuperAdminRoute>
+                    <AuditLogPage />
+                  </SuperAdminRoute>
+                }
+              />
+              <Route
+                path="staff"
+                element={
+                  <SuperAdminRoute>
+                    <StaffAccountsPage />
+                  </SuperAdminRoute>
+                }
+              />
+              <Route path="settings" element={<AdminSettingsPage />} />
+            </Route>
+          </Routes>
+        </RouteNavigationShell>
       </AdminAuthProvider>
     </BrowserRouter>
   )

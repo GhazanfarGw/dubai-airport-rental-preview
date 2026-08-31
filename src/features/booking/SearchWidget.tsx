@@ -133,10 +133,10 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
       noValidate
       className={
         'w-full rounded-2xl border border-brand-navy/10 bg-white shadow-lg shadow-brand-navy/5 ' +
-        (compact ? 'p-4' : 'p-5 sm:p-6')
+        (compact ? 'p-3 sm:p-4' : 'p-5 sm:p-6')
       }
     >
-      <div className="flex flex-wrap items-end gap-3">
+      <div className={fieldRow ? 'flex w-full flex-wrap items-end gap-2 lg:flex-nowrap' : 'flex flex-wrap items-end gap-3'}>
         <CitySelect
           label={t('searchWidget.pickupCity')}
           ariaLabel={t('searchWidget.pickupCity')}
@@ -173,7 +173,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
           />
         )}
 
-        <div className={fieldRow ? 'w-56 shrink-0 sm:w-64' : 'w-full sm:w-64'}>
+        <div className={fieldRow ? 'min-w-0 flex-1 sm:min-w-[220px]' : 'w-full sm:w-64'}>
           <DateRangePicker
             row
             startDate={startDate}
@@ -199,7 +199,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
         </Button>
       </div>
 
-      <label className="mt-3 flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600">
+      <label className={(fieldRow ? 'mt-2' : 'mt-3') + ' flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600'}>
         <input
           type="checkbox"
           checked={sameReturnLocation}

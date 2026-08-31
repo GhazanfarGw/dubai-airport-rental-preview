@@ -5,12 +5,12 @@ import { SearchWidget } from '@/features/booking/SearchWidget'
 import { FilterBar } from '@/features/booking/FilterBar'
 import { VehicleCard } from '@/features/booking/VehicleCard'
 import { StateMessage, Spinner } from '@/features/shared/StateMessage'
-import { searchVehiclesWithAvailability, fetchAllAvailableVehicles, BookingApiError } from '@/features/booking/api'
+import { searchVehiclesWithAvailability, fetchAllAvailableVehicles, fetchLocations, BookingApiError } from '@/features/booking/api'
 import { criteriaToSearchParams, isCompleteCriteria, searchParamsToCriteria } from '@/features/booking/searchParams'
 import { validateDateRange, rentalDays } from '@/lib/dateRange'
 import { applyFilters, distinctBrands, distinctCategories, distinctTransmissions, sortByPrice } from '@/lib/vehicleFilters'
 import { EMPTY_FILTERS } from '@/types/domain'
-import type { SearchCriteria, SortOption, VehicleFilters, VehicleSearchResult } from '@/types/domain'
+import type { Location, SearchCriteria, SortOption, VehicleFilters, VehicleSearchResult } from '@/types/domain'
 
 type LoadState =
   | { status: 'idle' }
@@ -19,7 +19,7 @@ type LoadState =
   | { status: 'loaded'; vehicles: VehicleSearchResult[] }
 
 export function SearchResultsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
@@ -32,6 +32,14 @@ export function SearchResultsPage() {
   const [state, setState] = useState<LoadState>({ status: 'idle' })
   const [filters, setFilters] = useState<VehicleFilters>(EMPTY_FILTERS)
   const [sort, setSort] = useState<SortOption>('price_asc')
+  const [locations, setLocations] = useState<Location[]>([])
+  const [editingSearch, setEditingSearch] = useState(!complete)
+
+  useEffect(() => {
+    fetchLocations().then(setLocations).catch(() => setLocations([]))
+  }, [])
+
+  useEffect(() => setEditingSearch(!complete), [complete])
 
   useEffect(() => {
     setFilters(EMPTY_FILTERS)
@@ -88,15 +96,34 @@ export function SearchResultsPage() {
     navigate({ pathname: '/search', search: criteriaToSearchParams(next).toString() })
   }
 
-  return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <SearchWidget
-        compact
-        initialValues={complete ? criteria : undefined}
-        onSearch={handleSearch}
-      />
+  const locationName = (id?: string) => locations.find((location) => location.id === id)?.name ?? t('vehicleDetail.notSelected')
+  const dateLabel = hasDates
+    ? new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'short' }).format(new Date(`${criteria.startDate}T00:00:00`)) +
+      ' – ' + new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${criteria.endDate}T00:00:00`))
+    : t('vehicleDetail.notSelected')
 
-      <div className="mt-8">
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-3xl bg-brand-navy px-5 py-7 text-white shadow-xl sm:px-8 sm:py-9">
+        <div className="flex flex-wrap items-start justify-between gap-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-gold">{t('common.dubaiOnly')}</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{t('searchResults.heroTitle')}</h1>
+          </div>
+          {complete && <button type="button" onClick={() => setEditingSearch((current) => !current)} aria-expanded={editingSearch} className="inline-flex min-h-11 items-center rounded-lg border border-white/30 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-brand-gold">{t('searchResults.editSearch')}</button>}
+        </div>
+        {complete && (
+          <div className="mt-7 grid gap-3 text-sm sm:grid-cols-3">
+            <SummaryItem label={t('searchResults.pickup')} value={locationName(criteria.pickupLocationId)} />
+            <SummaryItem label={t('searchResults.dropoff')} value={locationName(criteria.dropoffLocationId)} />
+            <SummaryItem label={t('searchResults.dates')} value={dateLabel} detail={`${days} ${t(days === 1 ? 'common.day' : 'common.days')}`} />
+          </div>
+        )}
+      </section>
+
+      {editingSearch && <div className="mt-4"><SearchWidget compact layout="row" initialValues={complete ? criteria : undefined} onSearch={handleSearch} /></div>}
+
+      <div className="mt-6">
         {!hasDates && state.status === 'loaded' && (
           <p className="mb-4 text-sm text-slate-500">{t('searchResults.browsingAllHint')}</p>
         )}
@@ -132,40 +159,39 @@ export function SearchResultsPage() {
         )}
 
         {state.status === 'loaded' && state.vehicles.length > 0 && (
-          <div className="space-y-5">
-            <FilterBar
-              categories={distinctCategories(state.vehicles)}
-              brands={distinctBrands(state.vehicles)}
-              transmissions={distinctTransmissions(state.vehicles)}
-              filters={filters}
-              sort={sort}
-              resultCount={filteredSorted.length}
-              onFiltersChange={setFilters}
-              onSortChange={setSort}
-              showAvailabilityFilter={hasDates}
-            />
-
-            {filteredSorted.length === 0 ? (
-              <StateMessage
-                title={t('searchResults.noVehiclesTitle')}
-                body={t('searchResults.noVehiclesBody')}
-              />
-            ) : (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredSorted.map((vehicle) => (
-                  <VehicleCard
-                    key={vehicle.id}
-                    vehicle={vehicle}
-                    days={hasDates ? days : undefined}
-                    detailHref={`/vehicles/${vehicle.id}?${searchParams.toString()}`}
-                    isAvailable={vehicle.isAvailable}
-                  />
-                ))}
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-brand-navy/10 pb-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-gold-dark">{t('searchResults.resultsEyebrow')}</p>
+                <h2 className="mt-1 text-xl font-semibold tracking-tight text-brand-navy sm:text-2xl">{t('searchResults.title')}</h2>
               </div>
-            )}
+              <p className="text-sm text-slate-500" aria-live="polite">{t('searchResults.resultsCount', { count: filteredSorted.length })}</p>
+            </div>
+            <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-8">
+              <FilterBar categories={distinctCategories(state.vehicles)} brands={distinctBrands(state.vehicles)} transmissions={distinctTransmissions(state.vehicles)} filters={filters} sort={sort} resultCount={filteredSorted.length} onFiltersChange={setFilters} onSortChange={setSort} showAvailabilityFilter={hasDates} />
+              <div className="mt-5 lg:mt-0">
+                {filteredSorted.length === 0 ? (
+                  <StateMessage title={t('searchResults.noVehiclesTitle')} body={t('searchResults.filterZeroBody')} action={<button type="button" onClick={() => setFilters(EMPTY_FILTERS)} className="min-h-11 rounded-lg bg-brand-navy px-4 text-sm font-semibold text-white">{t('searchResults.filters.clear')}</button>} />
+                ) : (
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    {filteredSorted.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} days={hasDates ? days : undefined} detailHref={`/vehicles/${vehicle.id}?${searchParams.toString()}`} isAvailable={vehicle.isAvailable} />)}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function SummaryItem({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return (
+    <div className="rounded-xl border border-white/15 bg-white/10 p-4">
+      <p className="text-xs font-medium text-white/65">{label}</p>
+      <p className="mt-1 truncate font-semibold">{value}</p>
+      {detail && <p className="mt-1 text-xs text-white/65">{detail}</p>}
     </div>
   )
 }

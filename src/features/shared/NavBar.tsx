@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
+import { prefersReducedMotion } from '@/lib/motion'
 
 /**
  * Premium header. Desktop: logo, Home, Browse Fleet, Car Types, About,
@@ -13,7 +14,32 @@ import { LinkButton } from '@/features/shared/ui/LinkButton'
  */
 export function NavBar() {
   const [open, setOpen] = useState(false)
+  const [visible, setVisible] = useState(true)
+  const lastScrollY = useRef(0)
   const { t } = useTranslation()
+  const reducedMotion = prefersReducedMotion()
+
+  useEffect(() => {
+    function handleScroll() {
+      const currentScrollY = window.scrollY
+      const scrollingUp = currentScrollY < lastScrollY.current
+      const atTop = currentScrollY <= 12
+
+      setVisible(atTop || scrollingUp)
+      if (currentScrollY > lastScrollY.current && open) setOpen(false)
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [open])
+
+  useEffect(() => {
+    document.documentElement.dataset.headerVisible = String(visible)
+    window.dispatchEvent(new CustomEvent('headervisibilitychange', { detail: { visible } }))
+  }, [visible])
 
   const links = [
     { to: '/', label: t('nav.home'), end: true },
@@ -25,7 +51,7 @@ export function NavBar() {
   const anchors = [{ to: { pathname: '/', hash: '#how-it-works' }, label: t('nav.services') }]
 
   return (
-    <header className="sticky top-0 z-40 border-b border-brand-navy/10 bg-white/95 backdrop-blur">
+    <header className={'sticky top-0 z-40 border-b border-brand-navy/10 bg-white/95 backdrop-blur ' + (reducedMotion ? '' : 'transition-transform duration-300 ') + (visible ? 'translate-y-0' : '-translate-y-full')}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-navy text-sm font-bold text-white">
